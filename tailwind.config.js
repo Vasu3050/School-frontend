@@ -32,9 +32,52 @@ export default {
           primaryDark: "#f9fafb",     // Headings, main text
           secondaryDark: "#d1d5db",   // Paragraphs, details
           mutedDark: "#9ca3af",       // Captions, notes
-        }
-      }
-    }
+        },
+
+        // 🌸 Extra Palette with Light & Dark Shades
+
+        pink: {
+          light: "#ec4899",  // Hot Pink 500
+          dark: "#be185d"    // Deep Pink 700
+        },
+
+        blue: {
+          light: "#3b82f6",  // Blue 500
+          dark: "#1e40af"    // Navy Blue 800
+        },
+
+        red: {
+          light: "#f87171",  // Red 400
+          dark: "#991b1b"    // Dark Red 800
+        },
+
+        green: {
+          light: "#22c55e",  // Emerald Green 500
+          dark: "#166534"    // Dark Green 800
+        },
+
+        white: {
+          light: "#ffffff",  // Pure White
+          dark: "#f9fafb"    // Off White / Light Gray
+        },
+
+        black: {
+          light: "#111827",  // Very Dark Gray (almost black)
+          dark: "#000000"    // True Black
+        },
+      },
+    },
   },
+  // Add this to your theme.extend section
+animation: {
+  shimmer: 'shimmer 2s linear infinite',
+  pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+},
+keyframes: {
+  shimmer: {
+    '0%': { transform: 'translateX(-100%)' },
+    '100%': { transform: 'translateX(100%)' },
+  },
+},
   plugins: [],
 }
