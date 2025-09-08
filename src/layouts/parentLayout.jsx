@@ -1,9 +1,9 @@
 import React from 'react'
 
-function parentLayout() {
+function ParentLayout() {
   return (
-    <div>parentLayout</div>
+    <div>ParentLayout</div>
   )
 }
 
-export default parentLayout
+export default ParentLayout

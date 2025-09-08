@@ -1,121 +1,232 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { registerUser } from "../api/authApi.js";
 import { useNavigate } from "react-router-dom";
+import InputField from "../components/InputField";
+import SubmitButton from "../components/SubmitButton";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+
   const {
-    register,
+    control,
     handleSubmit,
+    watch,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      role: "",
+      sid: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  const password = watch("password");
+  const role = watch("role");
 
   const mutation = useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
       console.log("Registered:", data);
-      navigate("/login"); 
+      navigate("/redirecting"); // Changed from /login to /redirecting
     },
   });
 
   const onSubmit = (formData) => {
-    console.log(formData);
+    // If role is not parent, remove sid from formData
+    if (formData.role !== "parent") {
+      delete formData.sid;
+    }
     mutation.mutate(formData);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark px-4">
-      <div className="w-full max-w-md bg-surface-light dark:bg-surface-dark rounded-2xl shadow-md p-8">
+    <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark p-8">
+      <div className="w-full max-w-md bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl p-8 relative">
         <h2 className="text-2xl font-bold text-text-primaryLight dark:text-text-primaryDark mb-6 text-center">
           Create an Account
         </h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Name */}
-          <div>
-            <input
-              {...register("name", { required: "Name is required" })}
-              placeholder="Full Name"
-              className="w-full px-4 py-2 rounded-lg border border-neutral-light dark:border-neutral-dark bg-surfaceAlt-light dark:bg-surfaceAlt-dark text-text-primaryLight dark:text-text-primaryDark focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark"
-            />
-            {errors.name && (
-              <p className="text-danger-light dark:text-danger-dark text-sm mt-1">
-                {errors.name.message}
-              </p>
+          <Controller
+            name="name"
+            control={control}
+            rules={{
+              required: "Name is required",
+              minLength: { value: 3, message: "Name must be at least 3 characters" },
+            }}
+            render={({ field }) => (
+              <InputField
+                label="Full Name"
+                placeholder="Enter your full name"
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.name?.message}
+              />
             )}
-          </div>
+          />
 
           {/* Email */}
-          <div>
-            <input
-              {...register("email", { required: "Email is required" })}
-              type="email"
-              placeholder="Email Address"
-              className="w-full px-4 py-2 rounded-lg border border-neutral-light dark:border-neutral-dark bg-surfaceAlt-light dark:bg-surfaceAlt-dark text-text-primaryLight dark:text-text-primaryDark focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark"
-            />
-            {errors.email && (
-              <p className="text-danger-light dark:text-danger-dark text-sm mt-1">
-                {errors.email.message}
-              </p>
+          <Controller
+            name="email"
+            control={control}
+            rules={{
+              required: "Email is required",
+              pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Invalid email address" },
+            }}
+            render={({ field }) => (
+              <InputField
+                label="Email Address"
+                type="email"
+                placeholder="Enter your email"
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.email?.message}
+              />
             )}
-          </div>
+          />
 
-          {/* Password */}
-          <div>
-            <input
-              {...register("password", { required: "Password is required" })}
-              type="password"
-              placeholder="Password"
-              className="w-full px-4 py-2 rounded-lg border border-neutral-light dark:border-neutral-dark bg-surfaceAlt-light dark:bg-surfaceAlt-dark text-text-primaryLight dark:text-text-primaryDark focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark"
-            />
-            {errors.password && (
-              <p className="text-danger-light dark:text-danger-dark text-sm mt-1">
-                {errors.password.message}
-              </p>
+          {/* Phone */}
+          <Controller
+            name="phone"
+            control={control}
+            rules={{
+              required: "Phone number is required",
+              validate: (value) => {
+                const phone = value.replace(/\D/g, "").slice(-10);
+                return /^\d{10}$/.test(phone) || "Enter a valid 10-digit phone number";
+              },
+            }}
+            render={({ field }) => (
+              <InputField
+                label="Phone Number"
+                placeholder="Enter 10-digit phone number"
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.phone?.message}
+              />
             )}
-          </div>
+          />
 
-          {/* Role */}
-          <div>
-            <select
-              {...register("role", { required: "Role is required" })}
-              className="w-full px-4 py-2 rounded-lg border border-neutral-light dark:border-neutral-dark bg-surfaceAlt-light dark:bg-surfaceAlt-dark text-text-primaryLight dark:text-text-primaryDark focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark"
-            >
-              <option value="">Select Role</option>              
-              <option value="teacher">Teacher</option>
-              <option value="parent">Parent</option>              
-            </select>
+          {/* Role Selection */}
+          <div className="space-y-3">
+            <label className="text-sm font-semibold text-text-primaryLight dark:text-text-primaryDark">
+              Select Your Role
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <label className="relative cursor-pointer">
+                <input
+                  type="radio"
+                  value="parent"
+                  {...control.register("role", { required: "Please select a role" })}
+                  className="sr-only peer"
+                />
+                <div
+                  className="p-3 rounded-xl border-2 transition-all duration-300 text-center border-neutral-light bg-surface-light text-text-primaryLight hover:border-primary-light hover:shadow-md dark:border-neutral-dark dark:bg-surfaceAlt-dark dark:text-text-primaryDark dark:hover:border-primary-dark peer-checked:bg-gradient-to-r peer-checked:from-green-light peer-checked:to-green-dark peer-checked:text-white-light peer-checked:border-transparent peer-checked:shadow-lg peer-checked:scale-105 dark:peer-checked:from-green-dark dark:peer-checked:to-green-light dark:peer-checked:text-white-dark"
+                >
+                  <div className="text-xl mb-1">👨‍👩‍👧‍👦</div>
+                  <div className="text-sm font-medium">Parent</div>
+                </div>
+              </label>
+              <label className="relative cursor-pointer">
+                <input
+                  type="radio"
+                  value="teacher"
+                  {...control.register("role", { required: "Please select a role" })}
+                  className="sr-only peer"
+                />
+                <div
+                  className="p-3 rounded-xl border-2 transition-all duration-300 text-center border-neutral-light bg-surface-light text-text-primaryLight hover:border-primary-light hover:shadow-md dark:border-neutral-dark dark:bg-surfaceAlt-dark dark:text-text-primaryDark dark:hover:border-primary-dark peer-checked:bg-gradient-to-r peer-checked:from-blue-light peer-checked:to-blue-dark peer-checked:text-white-light peer-checked:border-transparent peer-checked:shadow-lg peer-checked:scale-105 dark:peer-checked:from-blue-dark dark:peer-checked:to-blue-light dark:peer-checked:text-white-dark"
+                >
+                  <div className="text-xl mb-1">👩‍🏫</div>
+                  <div className="text-sm font-medium">Teacher</div>
+                </div>
+              </label>
+            </div>
             {errors.role && (
-              <p className="text-danger-light dark:text-danger-dark text-sm mt-1">
+              <p className="text-sm text-danger-light dark:text-danger-dark flex items-center gap-1 mt-1">
                 {errors.role.message}
               </p>
             )}
           </div>
 
-          {/* Phone */}
-          <div>
-            <input
-              {...register("phone", { required: "Phone number is required" })}
-              type="tel"
-              placeholder="Phone Number"
-              className="w-full px-4 py-2 rounded-lg border border-neutral-light dark:border-neutral-dark bg-surfaceAlt-light dark:bg-surfaceAlt-dark text-text-primaryLight dark:text-text-primaryDark focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark"
+          {/* Student ID (Conditional for Parent Role) */}
+          {role === "parent" && (
+            <Controller
+              name="sid"
+              control={control}
+              rules={{
+                required: "Student ID is required for parent registration",
+                pattern: {
+                  value: /^sid\d{1,5}$/,
+                  message: "Student ID must be in the format 'sid' followed by 1-5 digits (e.g., sid1, sid009, sid00006)",
+                },
+              }}
+              render={({ field }) => (
+                <InputField
+                  label="Student ID"
+                  placeholder="Enter student ID (e.g., sid1, sid009)"
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.sid?.message}
+                />
+              )}
             />
-            {errors.phone && (
-              <p className="text-danger-light dark:text-danger-dark text-sm mt-1">
-                {errors.phone.message}
-              </p>
+          )}
+
+          {/* Password */}
+          <Controller
+            name="password"
+            control={control}
+            rules={{
+              required: "Password is required",
+              minLength: { value: 6, message: "Password must be at least 6 characters" },
+            }}
+            render={({ field }) => (
+              <InputField
+                label="Password"
+                type="password"
+                placeholder="Enter your password"
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.password?.message}
+              />
             )}
-          </div>
+          />
+
+          {/* Confirm Password */}
+          <Controller
+            name="confirmPassword"
+            control={control}
+            rules={{
+              required: "Confirm Password is required",
+              validate: (value) => value === password || "Passwords do not match",
+            }}
+            render={({ field }) => (
+              <InputField
+                label="Confirm Password"
+                type="password"
+                placeholder="Re-enter your password"
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.confirmPassword?.message}
+              />
+            )}
+          />
 
           {/* Submit Button */}
-          <button
+          <SubmitButton
             type="submit"
             disabled={mutation.isLoading}
-            className="w-full py-2 rounded-lg bg-primary-light dark:bg-primary-dark text-white-light dark:text-white-dark font-medium hover:opacity-90 transition disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-primary-light to-blue-light dark:from-primary-dark dark:to-blue-dark text-white-light dark:text-white-dark font-semibold py-4 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             {mutation.isLoading ? "Registering..." : "Register"}
-          </button>
+          </SubmitButton>
 
           {/* Error Message */}
           {mutation.isError && (

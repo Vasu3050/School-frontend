@@ -1,9 +1,9 @@
 import React from 'react'
 
-function teacherLayout() {
+function TeacherLayout() {
   return (
-    <div>teacherLayout</div>
+    <div>TeacherLayout</div>
   )
 }
 
-export default teacherLayout
+export default TeacherLayout

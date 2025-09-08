@@ -1,8 +1,13 @@
-export default function SubmitButton({ children, ...props }) {
+import classNames from 'classnames';
+
+export default function SubmitButton({ children, className, ...props }) {
   return (
     <button
       {...props}
-      className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+      className={classNames(
+        "w-full py-2 rounded-lg transition-colors",
+        className
+      )}
     >
       {children}
     </button>

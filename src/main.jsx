@@ -11,7 +11,10 @@ import ContactUsPage from "./pages/ContactUsPage.jsx";
 import LogInPage from "./pages/LogInPage.jsx";
 import GalleryPage from "./pages/GalleryPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
-
+import Redirecting from "./components/Redirecting.jsx";
+import AdminLayout from "./layouts/AdminLayout.jsx";
+import ParentLayout from "./layouts/ParentLayout.jsx";
+import TeacherLayout from "./layouts/teacherLayout.jsx";
 
 const router = createBrowserRouter([
   {
@@ -42,7 +45,22 @@ const router = createBrowserRouter([
         path: "register",
         element: <RegisterPage />,
       },
-
+      {
+        path: "redirecting",
+        element: <Redirecting />,
+      },
+      {
+        path: "admin",
+        element: <AdminLayout />,
+      },
+      {
+        path: "teacher",
+        element: <TeacherLayout />,
+      },
+      {
+        path: "parent",
+        element: <ParentLayout />,
+      },
     ],
   },
 ]);

@@ -1,26 +1,42 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink, Link } from "react-router-dom";
-import { toggleMode } from "../features/theme/themeSlice.js";
-import { useSelector, useDispatch } from "react-redux";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const dispatch = useDispatch();
-  const mode = useSelector((state) => state.theme.mode);
-
-  useEffect(() => {
-    if (mode === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [mode]);
+  const [isDark, setIsDark] = useState(false);
 
   const schoolName =
     import.meta.env.VITE_SCHOOL_NAME || "Little Stars Preschool";
   const logoUrl = import.meta.env.VITE_LOGO_URL || null;
 
+  // Initialize theme from localStorage or system preference
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+      setIsDark(true);
+      document.documentElement.classList.add('dark');
+    } else {
+      setIsDark(false);
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  
+  const toggleTheme = () => {
+    const newTheme = !isDark;
+    setIsDark(newTheme);
+    
+    if (newTheme) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
 
   const navLinkClass = ({ isActive }) =>
     `relative px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:scale-105 ${
@@ -33,11 +49,11 @@ function Header() {
     `block px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
       isActive
         ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
-        : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+        : "text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400"
     }`;
 
   return (
-    <header className="sticky top-0 z-50 bg-white/30 dark:bg-background-dark backdrop-blur-md dark:backdrop-blur-md border-b border-white/20">
+    <header className="sticky top-0 z-50 bg-white/30 dark:bg-gray-900/30 backdrop-blur-md border-b border-white/20 dark:border-gray-700/30">
       {/* Top decorative bar */}
       <div className="h-2 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400"></div>
 
@@ -53,7 +69,7 @@ function Header() {
                   className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover ring-2 ring-yellow-400 group-hover:ring-4 transition-all duration-300"
                 />
               ) : (
-                <div className="h-10 w-10 sm:h-5 sm:w-5 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center ring-2 ring-yellow-400 group-hover:ring-4 transition-all duration-300 shadow-md">
+                <div className="h-10 w-10 sm:h-12 sm:w-12 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center ring-2 ring-yellow-400 group-hover:ring-4 transition-all duration-300 shadow-md">
                   {/* Star Icon SVG */}
                   <svg
                     className="h-5 w-5 text-white"
@@ -81,7 +97,7 @@ function Header() {
               <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-red-600 via-yellow-400 to-green-700 bg-clip-text text-transparent">
                 {schoolName}
               </h1>
-              <p className="text-[10px] sm:text-xs text-gray-500 hidden md:block">
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 hidden md:block">
                 Where Learning is Fun!
               </p>
             </div>
@@ -90,7 +106,7 @@ function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-2">
             <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-1 shadow-lg">
-              <div className="bg-white rounded-full p-1">
+              <div className="bg-white dark:bg-gray-800 rounded-full p-1">
                 <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full px-2 py-1 flex items-center gap-2">
                   <NavLink to="/" className={navLinkClass}>
                     <span className="flex items-center gap-2">
@@ -133,37 +149,32 @@ function Header() {
             </div>
           </nav>
 
-          {/* Right side - Login/Register button and Mobile menu */}
-          <div className="flex items-center justify-between gap-2 flex-shrink-0 ">
+          {/* Right side - Theme Toggle, Login/Register button and Mobile menu */}
+          <div className="flex items-center justify-between gap-2 flex-shrink-0">
+            {/* Theme Toggle Button */}
             <button
-              onClick={() => dispatch(toggleMode())}
-              className="
-                  p-2 rounded-full
-                  bg-neutral-light dark:bg-neutral-dark
-                  text-text-primaryLight dark:text-text-primaryDark
-                  shadow hover:scale-105 transition
-                "
+              onClick={toggleTheme}
+              className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow hover:scale-105 transition-all duration-300 hover:bg-gray-200 dark:hover:bg-gray-700"
               aria-label="Toggle theme"
             >
-              {mode === "light" ? (
-                // Sun icon
+              {isDark ? (
+                // Sun icon for light mode
                 <svg
-  xmlns="http://www.w3.org/2000/svg"
-  className="h-5 w-5"
-  fill="none"
-  viewBox="0 0 24 24"
-  stroke="currentColor"
-  strokeWidth={2}
->
-  <path
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364 6.364l-1.414-1.414M6.05 6.05L4.636 4.636m0 14.728l1.414-1.414M18.364 5.636l-1.414 1.414M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-  />
-</svg>
-
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364 6.364l-1.414-1.414M6.05 6.05L4.636 4.636m0 14.728l1.414-1.414M18.364 5.636l-1.414 1.414M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
+                </svg>
               ) : (
-                // Moon icon
+                // Moon icon for dark mode
                 <svg
                   className="h-5 w-5"
                   fill="none"
@@ -179,6 +190,7 @@ function Header() {
                 </svg>
               )}
             </button>
+
             <Link
               to="/login"
               className="relative bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-base overflow-hidden group"
@@ -199,6 +211,7 @@ function Header() {
               </svg>
               <span className="relative z-10">Login / Register</span>
             </Link>
+
             {/* Mobile Menu Button */}
             <button
               onClick={toggleMenu}
@@ -244,7 +257,7 @@ function Header() {
             isMenuOpen ? "max-h-96 opacity-100 mb-4" : "max-h-0 opacity-0"
           }`}
         >
-          <nav className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-4 shadow-inner border-2 border-blue-100">
+          <nav className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-4 shadow-inner border-2 border-blue-100 dark:border-gray-700">
             <NavLink
               to="/"
               className={mobileNavLinkClass}
@@ -290,8 +303,8 @@ function Header() {
               </span>
             </NavLink>
 
-            <div className="mt-4 pt-4 border-t-2 border-dashed border-blue-200">
-              <p className="text-center text-sm text-gray-500 font-medium">
+            <div className="mt-4 pt-4 border-t-2 border-dashed border-blue-200 dark:border-gray-600">
+              <p className="text-center text-sm text-gray-500 dark:text-gray-400 font-medium">
                 🌈 More options coming soon! 🎨
               </p>
             </div>
