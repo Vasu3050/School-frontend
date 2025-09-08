@@ -1,4 +1,3 @@
-// src/api/authApi.js
 import API from "./Axios.js";
 
 export const registerUser = async (formData) => {

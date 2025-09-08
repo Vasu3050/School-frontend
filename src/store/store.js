@@ -1,10 +1,10 @@
-// store.js
 import { configureStore } from '@reduxjs/toolkit';
-import themeReducer from '../features/theme/themeSlice';
+import userReducer form "../features/userSlice.js";
 
 const store = configureStore({
   reducer: {
-    theme: themeReducer,
+    // user: userReducer,
+        
   },
 });
 
