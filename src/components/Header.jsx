@@ -1,11 +1,23 @@
-// Header.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, Link } from "react-router-dom";
+import { toggleMode } from "../features/theme/themeSlice.js";
+import { useSelector, useDispatch } from "react-redux";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const dispatch = useDispatch();
+  const mode = useSelector((state) => state.theme.mode);
 
-  const schoolName = import.meta.env.VITE_SCHOOL_NAME || "Little Stars Preschool";
+  useEffect(() => {
+    if (mode === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [mode]);
+
+  const schoolName =
+    import.meta.env.VITE_SCHOOL_NAME || "Little Stars Preschool";
   const logoUrl = import.meta.env.VITE_LOGO_URL || null;
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -25,7 +37,7 @@ function Header() {
     }`;
 
   return (
-    <header className="sticky top-0 z-50 bg-white/30 backdrop-blur-md border-b border-white/20">
+    <header className="sticky top-0 z-50 bg-white/30 dark:bg-background-dark backdrop-blur-md dark:backdrop-blur-md border-b border-white/20">
       {/* Top decorative bar */}
       <div className="h-2 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400"></div>
 
@@ -123,6 +135,50 @@ function Header() {
 
           {/* Right side - Login/Register button and Mobile menu */}
           <div className="flex items-center justify-between gap-2 flex-shrink-0 ">
+            <button
+              onClick={() => dispatch(toggleMode())}
+              className="
+                  p-2 rounded-full
+                  bg-neutral-light dark:bg-neutral-dark
+                  text-text-primaryLight dark:text-text-primaryDark
+                  shadow hover:scale-105 transition
+                "
+              aria-label="Toggle theme"
+            >
+              {mode === "light" ? (
+                // Sun icon
+                <svg
+  xmlns="http://www.w3.org/2000/svg"
+  className="h-5 w-5"
+  fill="none"
+  viewBox="0 0 24 24"
+  stroke="currentColor"
+  strokeWidth={2}
+>
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364 6.364l-1.414-1.414M6.05 6.05L4.636 4.636m0 14.728l1.414-1.414M18.364 5.636l-1.414 1.414M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+  />
+</svg>
+
+              ) : (
+                // Moon icon
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"
+                  />
+                </svg>
+              )}
+            </button>
             <Link
               to="/login"
               className="relative bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-base overflow-hidden group"
@@ -143,7 +199,6 @@ function Header() {
               </svg>
               <span className="relative z-10">Login / Register</span>
             </Link>
-
             {/* Mobile Menu Button */}
             <button
               onClick={toggleMenu}

@@ -1,9 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { useSelector } from 'react-redux';
 
 function Footer() {
-  const { mode } = useSelector((state) => state.theme);
   const logoUrl = import.meta.env.VITE_LOGO_URL || null;
 
   // Fetch environment variables
@@ -61,7 +59,7 @@ function Footer() {
               Where Learning is Fun!
             </p>
             <div className="mt-4 flex items-center gap-2">
-              <div className="h-10 w-10 bg-gradient-to-br from-secondary-light to-accent-light dark:from-secondary-dark dark:to-accent-dark rounded-full flex items-center justify-center shadow-md">
+              <div className="h-2 w-12 bg-gradient-to-br from-secondary-light to-accent-light dark:from-secondary-dark dark:to-accent-dark rounded-full flex items-center justify-center shadow-md">
               <img
                   src={logoUrl}
                   alt={schoolName}

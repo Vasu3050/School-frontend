@@ -30,4 +30,6 @@ pnpm-error.log*
 .env.test.local
 .env.production.local
 
+todo.md
+
 

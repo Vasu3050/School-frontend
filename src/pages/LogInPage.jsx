@@ -1,8 +1,12 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 function LogInPage() {
   return (
-    <div>LogInPage</div>
+    <div>LogInPage
+      <Link to="/register">Go to Register</Link>
+      
+    </div>
   )
 }
 
