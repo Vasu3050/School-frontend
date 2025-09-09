@@ -12,6 +12,7 @@ import LogInPage from "./pages/LogInPage.jsx";
 import GalleryPage from "./pages/GalleryPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import Redirecting from "./components/Redirecting.jsx";
+import LoggingOut from "./components/LoggingOut.jsx"
 import AdminLayout from "./layouts/AdminLayout.jsx";
 import ParentLayout from "./layouts/ParentLayout.jsx";
 import TeacherLayout from "./layouts/teacherLayout.jsx";
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
       {
         path: "redirecting",
         element: <Redirecting />,
+      },
+      {
+        path: "logOut",
+        element: <LoggingOut />,
       },
       {
         path: "admin",

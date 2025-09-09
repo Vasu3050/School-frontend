@@ -33,3 +33,17 @@ export const loginUser = async (formData) => {
   }
 };
 
+export const logoutUser = async () => {
+  try {
+    const res = await API.post("/users/logout", {}, { withCredentials: true });
+    return res.data;
+  } catch (error) {
+    const backendMsg =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.response?.statusText ||
+      "Unknown error";
+    throw new Error(`${backendMsg} (status ${error.response?.status || "?"})`);    
+  }
+}
+
