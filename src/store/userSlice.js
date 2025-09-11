@@ -4,6 +4,7 @@ const initialState = {
   phone: null,
   email: null,
   roles: [],
+  role : null,
   status: null,
   accessToken: null,
   refreshToken: null,
@@ -17,6 +18,7 @@ const userSlice = createSlice({
       state.phone = action.payload.phone;
       state.email = action.payload.email;
       state.roles = action.payload.roles;
+      state.role = action.payload.role;
       state.status = action.payload.status;
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;

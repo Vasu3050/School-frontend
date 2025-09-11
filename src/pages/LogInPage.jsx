@@ -35,7 +35,7 @@ export default function Login() {
       });
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data, formData) => {
       const { user, accessToken, refreshToken } = data.data;
       dispatch(
         setUser({
@@ -43,15 +43,16 @@ export default function Login() {
           phone: user.phone,
           email: user.email,
           roles: user.roles,
+          role : formData.role,
           status: user.status,
           accessToken,
           refreshToken,
         })
       );
 
-      if (user.roles.includes("admin")) navigate("/admin");
-      else if (user.roles.includes("teacher")) navigate("/teacher");
-      else if (user.roles.includes("parent")) navigate("/parent");
+      if (user.roles.includes("admin") && formData.role === "admin") navigate("/admin");
+      else if (user.roles.includes("teacher") && formData.role === "teacher") navigate("/teacher");
+      else if (user.roles.includes("parent") && formData.role === "parent") navigate("/parent");
       else navigate("/");
     },
     onError: (error) => {

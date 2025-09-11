@@ -1,56 +1,55 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, Link, Navigate } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import LoginBtn from "./LoginBtn";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../api/authApi";
 import { logout as userLogout } from "../store/userSlice";
 import { useNavigate } from "react-router-dom";
 
-
-
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const dispatch = useDispatch();
   const accessToken = useSelector((state) => state.user.accessToken);
+  const userRole = useSelector((state) => state.user.role);
   const navigate = useNavigate();
-  const logOut = () =>{    
-    logoutUser();
-    dispatch(userLogout()); 
-    navigate("/logOut");
-  }
 
-  
-    const schoolName =
+  const logOut = () => {
+    logoutUser();
+    dispatch(userLogout());
+    navigate("/logOut");
+  };
+
+  const schoolName =
     import.meta.env.VITE_SCHOOL_NAME || "Little Stars Preschool";
   const logoUrl = import.meta.env.VITE_LOGO_URL || null;
 
   // Initialize theme from localStorage or system preference
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+    const savedTheme = localStorage.getItem("theme");
+    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    if (savedTheme === "dark" || (!savedTheme && systemPrefersDark)) {
       setIsDark(true);
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     } else {
       setIsDark(false);
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
   }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  
+
   const toggleTheme = () => {
     const newTheme = !isDark;
     setIsDark(newTheme);
-    
+
     if (newTheme) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
     } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
     }
   };
 
@@ -68,8 +67,58 @@ function Header() {
         : "text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400"
     }`;
 
+  // Navigation items
+  const navItems = [
+    {
+      path: "/",
+      label: "Home",
+      icon: (
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+          />
+        </svg>
+      ),
+    },
+    {
+      path: "/gallery",
+      label: "Photo gallery",
+      icon: (
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+      ),
+    },
+  ];
+
+  // Add role-based nav item if accessToken and role exist
+  if (accessToken && userRole) {
+    navItems.push({
+      path: `/${userRole.toLowerCase()}`,
+      label: userRole.charAt(0).toUpperCase() + userRole.slice(1),
+      icon: (
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M5.121 17.804A7 7 0 0112 15a7 7 0 016.879 2.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      ),
+    });
+  }
+
   return (
-    <header className="sticky top-0 z-50 bg-white/30 dark:bg-gray-900/30 backdrop-blur-md border-b border-white/20 dark:border-gray-700/30">
+    <header className="sticky top-0 z-50 bg-white/30 dark:bg-gray-900/30 backdrop-blur-md border-b border-white/20 dark:border-gray-700/30 transition-colors duration-500 ease-in-out">
       {/* Top decorative bar */}
       <div className="h-2 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400"></div>
 
@@ -122,62 +171,38 @@ function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-2">
             <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-1 shadow-lg">
-              <div className="bg-white dark:bg-gray-800 rounded-full p-1">
+              <div className="bg-white dark:bg-gray-800 rounded-full p-1 transition-colors duration-500">
                 <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full px-2 py-1 flex items-center gap-2">
-                  <NavLink to="/" className={navLinkClass}>
-                    <span className="flex items-center gap-2">
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                        />
-                      </svg>
-                      Home
-                    </span>
-                  </NavLink>
-                  <NavLink to="/gallery" className={navLinkClass}>
-                    <span className="flex items-center gap-2">
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      Photo gallery
-                    </span>
-                  </NavLink>
+                  {navItems.map((item, index) => (
+                    <NavLink
+                      key={`nav-item-${index}`}
+                      to={item.path}
+                      className={navLinkClass}
+                    >
+                      <span className="flex items-center gap-2">
+                        {item.icon}
+                        {item.label}
+                      </span>
+                    </NavLink>
+                  ))}
                 </div>
               </div>
             </div>
           </nav>
 
-          {/* Right side - Theme Toggle, Login/Register button and Mobile menu */}
+          {/* Right side - Theme Toggle, Login/Logout button and Mobile menu */}
           <div className="flex items-center justify-between gap-2 flex-shrink-0">
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow hover:scale-105 transition-all duration-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+              className="relative p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow hover:scale-110 transition-all duration-300 ease-in-out hover:bg-gray-200 dark:hover:bg-gray-700 transform"
               aria-label="Toggle theme"
             >
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-orange-300 dark:from-blue-500 dark:to-purple-500 opacity-0 hover:opacity-20 transition-opacity duration-300 rounded-full"></div>
               {isDark ? (
-                // Sun icon for light mode
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className="h-5 w-5 transform transition-transform duration-300 scale-100 hover:scale-125"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -190,9 +215,8 @@ function Header() {
                   />
                 </svg>
               ) : (
-                // Moon icon for dark mode
                 <svg
-                  className="h-5 w-5"
+                  className="h-5 w-5 transform transition-transform duration-300 scale-100 hover:scale-125"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -207,28 +231,30 @@ function Header() {
               )}
             </button>
 
-            {!accessToken ? <LoginBtn /> :<button
-      onClick={logOut}
-      className="relative bg-gradient-to-r from-red-500 to-rose-500 text-white px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-base overflow-hidden group"
-    >
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-      <svg
-        className="h-4 w-4 relative z-10"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M13 16l4-4m0 0l-4-4m4 4H3m5 4v1a3 3 0 003 3h7a3 3 0 003-3V7a3 3 0 00-3-3h-7a3 3 0 00-3 3v1"
-        />
-      </svg>
-      <span className="relative z-10">Logout</span>
-    </button>}
-
-
+            {!accessToken ? (
+              <LoginBtn />
+            ) : (
+              <button
+                onClick={logOut}
+                className="relative bg-gradient-to-r from-red-500 to-rose-500 text-white px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-base overflow-hidden group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                <svg
+                  className="h-4 w-4 relative z-10"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16l4-4m0 0l-4-4m4 4H3m5 4v1a3 3 0 003 3h7a3 3 0 003-3V7a3 3 0 00-3-3h-7a3 3 0 00-3 3v1"
+                  />
+                </svg>
+                <span className="relative z-10">Logout</span>
+              </button>
+            )}
 
             {/* Mobile Menu Button */}
             <button
@@ -272,55 +298,23 @@ function Header() {
         {/* Mobile Navigation Menu */}
         <div
           className={`lg:hidden overflow-hidden transition-all duration-500 ease-in-out ${
-            isMenuOpen ? "max-h-96 opacity-100 mb-4" : "max-h-0 opacity-0"
+            isMenuOpen ? "max-h-[500px] opacity-100 mb-4" : "max-h-0 opacity-0"
           }`}
         >
           <nav className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-4 shadow-inner border-2 border-blue-100 dark:border-gray-700">
-            <NavLink
-              to="/"
-              className={mobileNavLinkClass}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <span className="flex items-center gap-3">
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                  />
-                </svg>
-                Home
-              </span>
-            </NavLink>
-            <NavLink
-              to="/gallery"
-              className={mobileNavLinkClass}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <span className="flex items-center gap-3">
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                Gallery
-              </span>
-            </NavLink>
-
+            {navItems.map((item, index) => (
+              <NavLink
+                key={`mobile-nav-item-${index}`}
+                to={item.path}
+                className={mobileNavLinkClass}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <span className="flex items-center gap-3">
+                  {item.icon}
+                  {item.label}
+                </span>
+              </NavLink>
+            ))}
             <div className="mt-4 pt-4 border-t-2 border-dashed border-blue-200 dark:border-gray-600">
               <p className="text-center text-sm text-gray-500 dark:text-gray-400 font-medium">
                 🌈 More options coming soon! 🎨

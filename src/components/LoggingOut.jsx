@@ -22,7 +22,7 @@ export default function LoggingOut() {
 
     // Redirect after 3 seconds
     const timer = setTimeout(() => {
-      navigate("/login");
+      navigate("/");
     }, 1500);
 
     return () => clearTimeout(timer);

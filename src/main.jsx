@@ -12,10 +12,15 @@ import LogInPage from "./pages/LogInPage.jsx";
 import GalleryPage from "./pages/GalleryPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import Redirecting from "./components/Redirecting.jsx";
-import LoggingOut from "./components/LoggingOut.jsx"
+import LoggingOut from "./components/LoggingOut.jsx";
 import AdminLayout from "./layouts/AdminLayout.jsx";
 import ParentLayout from "./layouts/ParentLayout.jsx";
 import TeacherLayout from "./layouts/teacherLayout.jsx";
+import AdminDash from "./pages/Admin/AdminDash.jsx";
+import ManageParent from "./pages/Admin/ManageParent.jsx";
+import ManageStaff from "./pages/Admin/ManageStaff.jsx";
+// import ManageStudent from "./pages/Admin/ManageStudent.jsx";
+
 
 const router = createBrowserRouter([
   {
@@ -46,22 +51,45 @@ const router = createBrowserRouter([
         path: "register",
         element: <RegisterPage />,
       },
+
       {
         path: "redirecting",
         element: <Redirecting />,
       },
+
       {
         path: "logOut",
         element: <LoggingOut />,
       },
+
       {
         path: "admin",
         element: <AdminLayout />,
+        children: [
+
+          {
+            path :"",
+            element: <AdminDash />,
+          },
+
+          {
+            path: "parents",
+            element : <ManageParent />
+          },
+
+          {
+            path : "staff",
+            element : <ManageStaff/>
+          }
+                    
+        ],
       },
+
       {
         path: "teacher",
         element: <TeacherLayout />,
       },
+
       {
         path: "parent",
         element: <ParentLayout />,
