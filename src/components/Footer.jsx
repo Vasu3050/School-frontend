@@ -1,10 +1,10 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function Footer() {
+  const accessToken = useSelector((state) => state.user.accessToken);
   const logoUrl = import.meta.env.VITE_LOGO_URL || null;
-
-  // Fetch environment variables
   const schoolName = import.meta.env.VITE_SCHOOL_NAME || "Little Stars Preschool";
   const email = import.meta.env.VITE_CONTACT_EMAIL || "info@littlestarspreschool.com";
   const phone = import.meta.env.VITE_CONTACT_PHONE || "(123) 456-7890";
@@ -13,7 +13,6 @@ function Footer() {
   const googleRating = import.meta.env.VITE_GOOGLE_RATING || "4.8";
   const licenseInfo = import.meta.env.VITE_LICENSE_INFO || "Licensed by Happy Town Education Board, License #12345";
 
-  // Generate star rating SVGs
   const renderStars = (rating) => {
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -43,14 +42,14 @@ function Footer() {
     return stars;
   };
 
+  // Hide footer if user is logged in
+  if (accessToken) return null;
+
   return (
     <footer className="bg-surface-light dark:bg-surface-dark text-text-primaryLight dark:text-text-primaryDark border-t border-neutral-light dark:border-neutral-dark">
-      {/* Top decorative bar */}
       <div className="h-2 bg-gradient-to-r from-pink-light via-blue-light to-green-light dark:from-pink-dark dark:via-blue-dark dark:to-green-dark"></div>
-
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* School Info and Logo */}
           <div className="flex flex-col items-center md:items-start">
             <h2 className="text-2xl font-bold bg-gradient-to-r from-red-light via-secondary-light to-green-light dark:from-red-dark dark:via-secondary-dark dark:to-green-dark bg-clip-text text-transparent">
               {schoolName}
@@ -60,19 +59,17 @@ function Footer() {
             </p>
             <div className="mt-4 flex items-center gap-2">
               <div className="h-2 w-12 bg-gradient-to-br from-secondary-light to-accent-light dark:from-secondary-dark dark:to-accent-dark rounded-full flex items-center justify-center shadow-md">
-              <img
+                <img
                   src={logoUrl}
                   alt={schoolName}
                   className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover ring-2 ring-yellow-400 group-hover:ring-4 transition-all duration-300"
                 />
               </div>
               <p className="text-sm text-text-secondaryLight dark:text-text-secondaryDark">
-                Inspiring young minds 
+                Inspiring young minds
               </p>
             </div>
           </div>
-
-          {/* Quick Links */}
           <div className="flex flex-col items-center md:items-start">
             <h3 className="text-lg font-semibold text-text-primaryLight dark:text-text-primaryDark">
               Quick Links
@@ -90,7 +87,7 @@ function Footer() {
                     to={link.to}
                     className={({ isActive }) =>
                       `text-sm transition-all duration-300 hover:text-primary-light hover:dark:text-primary-dark ${
-                        isActive ? `text-primary-light dark:text-primary-dark font-medium` : `text-text-secondaryLight dark:text-text-secondaryDark`
+                        isActive ? "text-primary-light dark:text-primary-dark font-medium" : "text-text-secondaryLight dark:text-text-secondaryDark"
                       }`
                     }
                   >
@@ -100,8 +97,6 @@ function Footer() {
               ))}
             </ul>
           </div>
-
-          {/* Contact Info and Rating */}
           <div className="flex flex-col items-center md:items-start">
             <h3 className="text-lg font-semibold text-text-primaryLight dark:text-text-primaryDark">
               Contact Us
@@ -146,8 +141,6 @@ function Footer() {
             </ul>
           </div>
         </div>
-
-        {/* Licensing Info */}
         <div className="mt-8 pt-6 border-t border-neutral-light dark:border-neutral-dark text-center">
           <p className="text-sm text-text-mutedLight dark:text-text-mutedDark">
             {licenseInfo}
@@ -157,8 +150,6 @@ function Footer() {
           </p>
         </div>
       </div>
-
-      {/* Bottom decorative bar */}
       <div className="h-2 bg-gradient-to-r from-secondary-light via-pink-light to-blue-light dark:from-secondary-dark dark:via-pink-dark dark:to-blue-dark"></div>
     </footer>
   );
