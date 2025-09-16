@@ -1,26 +1,5 @@
 import React, { useState } from "react";
 
-/* ----------------- demo/default data (2 students) ----------------- */
-const exampleStudents = [
-  {
-    id: 1,
-    sid: "STU001",
-    name: "John Doe",
-    age: 15,
-    grade: "10th",
-    division: "A",
-  },
-  {
-    id: 2,
-    sid: "STU005",
-    name: "Vasudev Adabaddi",
-    age: 20,
-    grade: "12th",
-    division: "B",
-  },
-];
-
-/* ----------------- StudentCard ----------------- */
 function StudentCard({
   student,
   index = 0,
@@ -58,7 +37,7 @@ function StudentCard({
 
   return (
     <div
-      className={`p-3  sm:p-4 rounded-xl shadow-lg transition-all duration-200 ${bgColor} text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-600 relative`}
+      className={`p-3 sm:p-4 rounded-xl shadow-lg transition-all duration-200 ${bgColor} text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-600 relative`}
     >
       {/* Top row: avatar + name|SID + actions */}
       <div className="flex items-center gap-3 flex-nowrap">
@@ -90,7 +69,6 @@ function StudentCard({
                 title="Edit"
                 className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-sm"
               >
-                {/* original edit SVG */}
                 <svg
                   className="h-5 w-5"
                   fill="none"
@@ -112,7 +90,6 @@ function StudentCard({
                 title="Remove"
                 className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-sm"
               >
-                {/* original trash SVG */}
                 <svg
                   className="h-5 w-5"
                   fill="none"
@@ -133,7 +110,6 @@ function StudentCard({
                 title="View"
                 className="p-2 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-sm"
               >
-                {/* original eye SVG */}
                 <svg
                   className="h-5 w-5"
                   fill="none"
@@ -160,7 +136,6 @@ function StudentCard({
                 title="Attendance"
                 className="p-2 rounded-full bg-purple-500 hover:bg-purple-600 text-white shadow-sm"
               >
-                {/* original calendar/check SVG */}
                 <svg
                   className="h-5 w-5"
                   fill="none"
@@ -180,10 +155,9 @@ function StudentCard({
 
           {/* compact details row (single visual row on small screens) */}
           <div className="mt-1 flex items-center gap-3 text-xs sm:text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap overflow-hidden">
-            <span className="truncate">Age {student.age}</span>
+            <span className="truncate">Age {student.age ?? "N/A"}</span>
             <span className="truncate">• {student.grade}</span>
             <span className="truncate">• Div {student.division}</span>
-            {/* we already show SID after name; avoid duplicate here */}
           </div>
         </div>
 
@@ -195,24 +169,21 @@ function StudentCard({
             aria-label="More options"
             title="More"
           >
-            {/* three dots */}
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
             </svg>
           </button>
 
-          {/* Dropdown menu — constrained width to avoid overflow, includes original SVG icons */}
           {isMenuOpen && (
             <>
               <div
-                className="absolute right-0 top-full mt-2 w-auto min-w-[180px] max-w-[95vw] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 z-50 py-1"
+                className="absolute right-0 top-full mt-2 w-auto min-w-[180px] max-w-[95vw] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 z-50 py-1 bg-opacity-100"
                 role="menu"
               >
                 <button
                   onClick={handleEdit}
                   className="flex items-center gap-3 w-full px-4 py-2 text-left hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-800 dark:text-gray-100"
                 >
-                  {/* edit icon */}
                   <svg className="h-4 w-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
@@ -223,7 +194,6 @@ function StudentCard({
                   onClick={handleViewDetails}
                   className="flex items-center gap-3 w-full px-4 py-2 text-left hover:bg-green-50 dark:hover:bg-green-900/20 text-gray-800 dark:text-gray-100"
                 >
-                  {/* eye icon */}
                   <svg className="h-4 w-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -235,7 +205,6 @@ function StudentCard({
                   onClick={handleViewAttendance}
                   className="flex items-center gap-3 w-full px-4 py-2 text-left hover:bg-purple-50 dark:hover:bg-purple-900/20 text-gray-800 dark:text-gray-100"
                 >
-                  {/* calendar icon */}
                   <svg className="h-4 w-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                   </svg>
@@ -248,7 +217,6 @@ function StudentCard({
                   onClick={handleRemove}
                   className="flex items-center gap-3 w-full px-4 py-2 text-left hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
                 >
-                  {/* trash icon */}
                   <svg className="h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1v3M4 7h16" />
                   </svg>
@@ -256,7 +224,6 @@ function StudentCard({
                 </button>
               </div>
 
-              {/* overlay to close menu when clicking outside */}
               <div className="fixed inset-0 z-40" onClick={closeMenu} aria-hidden="true" />
             </>
           )}
@@ -266,39 +233,4 @@ function StudentCard({
   );
 }
 
-/* ----------------- StudentList: maps over students array (default: exampleStudents) ----------------- */
-function StudentList({ students = exampleStudents }) {
-  const handleEdit = (student) => {
-    console.log("Edit", student);
-    // implement modal / route / whatever you need
-  };
-  const handleRemove = (student) => {
-    console.log("Remove", student);
-  };
-  const handleViewDetails = (student) => {
-    console.log("View details", student);
-  };
-  const handleViewAttendance = (student) => {
-    console.log("View attendance", student);
-  };
-
-  return (
-    <div className="space-y-3 p-4">
-      {students.map((st, idx) => (
-        <StudentCard
-          key={st.id ?? st.sid ?? idx}
-          student={st}
-          index={idx}
-          onEdit={handleEdit}
-          onRemove={handleRemove}
-          onViewDetails={handleViewDetails}
-          onViewAttendance={handleViewAttendance}
-        />
-      ))}
-    </div>
-  );
-}
-
-/* ----------------- exports ----------------- */
-export default StudentList;
-export { StudentCard };
+export default StudentCard;

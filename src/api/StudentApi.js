@@ -1,4 +1,4 @@
-import { API } from "./Axios.js";
+import API from "./Axios.js";
 
 // Add a new student
 export const addStudent = async (formData) => {
@@ -70,11 +70,13 @@ export const getStudent = async ({ id, role }) => {
 };
 
 // Get a list of students with optional query parameters
-export const getStudents = async ({ page = 1, limit = 10, name, grade, sort = "asc", role }) => {
+export const getStudents = async ({ page = 1, limit = 10, name, grade, division, sid, sort = "asc", role }) => {
   try {
     const params = new URLSearchParams({ page, limit, sort, role });
     if (name) params.append("name", name);
     if (grade) params.append("grade", grade);
+    if (division) params.append("division", division);
+    if (sid) params.append("sid", sid);
 
     const res = await API.get(`/students/get-students?${params.toString()}`, {
       withCredentials: true,
