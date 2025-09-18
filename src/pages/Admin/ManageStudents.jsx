@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { addStudent, getStudents, updateStudent, deleteStudent } from "../../api/StudentApi.js";
+import { addStudent, getStudents, deleteStudent } from "../../api/StudentApi.js";
 import StudentCard from "../../components/StudentCard.jsx";
+import NotificationModal from "../../components/NotificationModel.jsx"; // Adjust path as needed
 
-const ViewAllStudents = () => {
+const ViewAllStudents = ({ openModal }) => {
   const [students, setStudents] = useState([]);
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -17,6 +18,9 @@ const ViewAllStudents = () => {
     sid: "",
     sort: "asc",
   });
+  const [selected, setSelected] = useState([]);
+
+  const isSelectMode = selected.length > 0;
 
   const fetchStudents = async (page = 1) => {
     try {
@@ -33,6 +37,11 @@ const ViewAllStudents = () => {
       });
     } catch (error) {
       console.error("Error fetching students:", error.message);
+      openModal({
+        type: "error",
+        title: "Error",
+        message: error.message || "Failed to fetch students",
+      });
     }
   };
 
@@ -41,7 +50,14 @@ const ViewAllStudents = () => {
   }, [filters]);
 
   const handleFilterChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
+    let value = e.target.value;
+    if (e.target.name === "sid") {
+      value = value.trim().toUpperCase();
+      if (value.startsWith("SID")) {
+        value = value.slice(3);
+      }
+    }
+    setFilters({ ...filters, [e.target.name]: value });
   };
 
   const handlePageChange = (page) => {
@@ -50,24 +66,81 @@ const ViewAllStudents = () => {
     }
   };
 
+  const toggleSelect = (id) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const selectAll = () => {
+    setSelected(students.map((s) => s._id));
+  };
+
+  const clearSelection = () => {
+    setSelected([]);
+  };
+
+  const handleDeleteSelected = () => {
+    openModal({
+      type: "confirm",
+      title: "Confirm Delete",
+      message: `Are you sure you want to delete ${selected.length} student(s)? This action cannot be undone.`,
+      confirmText: "Yes, Delete",
+      onConfirm: async () => {
+        try {
+          await Promise.all(selected.map((id) => deleteStudent(id)));
+          fetchStudents(pagination.currentPage);
+          openModal({
+            type: "success",
+            title: "Success",
+            message: `${selected.length} student(s) deleted successfully!`,
+          });
+          clearSelection();
+        } catch (error) {
+          openModal({
+            type: "error",
+            title: "Error",
+            message: error.message || "Failed to delete students",
+          });
+        }
+      },
+    });
+  };
+
   const handleEdit = (student) => {
     console.log("Edit student:", student);
     // Implement edit logic (e.g., open a modal with pre-filled form)
   };
 
-  const handleRemove = async (student) => {
-    try {
-      await deleteStudent(student._id);
-      fetchStudents(pagination.currentPage); // Refresh the list
-      alert("Student deleted successfully!");
-    } catch (error) {
-      alert(`Error deleting student: ${error.message}`);
-    }
+  const handleRemove = (student) => {
+    openModal({
+      type: "confirm",
+      title: "Confirm Delete",
+      message: `Are you sure you want to delete ${student.name} (${student.sid})? This action cannot be undone.`,
+      confirmText: "Yes, Delete",
+      onConfirm: async () => {
+        try {
+          await deleteStudent(student._id);
+          fetchStudents(pagination.currentPage);
+          openModal({
+            type: "success",
+            title: "Success",
+            message: "Student deleted successfully!",
+          });
+        } catch (error) {
+          openModal({
+            type: "error",
+            title: "Error",
+            message: error.message || "Failed to delete student",
+          });
+        }
+      },
+    });
   };
 
   const handleViewDetails = (student) => {
     console.log("View details:", student);
-    // Implement view details logic (e.g., show a modal with student info)
+    // Implement view details logic
   };
 
   const handleViewAttendance = (student) => {
@@ -115,26 +188,33 @@ const ViewAllStudents = () => {
           onChange={handleFilterChange}
           className="px-3 py-2 border rounded dark:bg-gray-800 dark:text-gray-200"
         />
-        <input
-          type="text"
+        <select
           name="grade"
-          placeholder="Filter by grade"
           value={filters.grade}
           onChange={handleFilterChange}
           className="px-3 py-2 border rounded dark:bg-gray-800 dark:text-gray-200"
-        />
-        <input
-          type="text"
+        >
+          <option value="">Filter by grade</option>
+          {["playgroup", "nursery", "LKG", "UKG", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"].map((grade) => (
+            <option key={grade} value={grade}>{grade}</option>
+          ))}
+        </select>
+        <select
           name="division"
-          placeholder="Filter by division"
           value={filters.division}
           onChange={handleFilterChange}
           className="px-3 py-2 border rounded dark:bg-gray-800 dark:text-gray-200"
-        />
+        >
+          <option value="">Filter by division</option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+        </select>
         <input
           type="text"
           name="sid"
-          placeholder="Filter by SID"
+          placeholder="Filter by SID (e.g., 01 or sid01)"
           value={filters.sid}
           onChange={handleFilterChange}
           className="px-3 py-2 border rounded dark:bg-gray-800 dark:text-gray-200"
@@ -150,6 +230,36 @@ const ViewAllStudents = () => {
         </select>
       </div>
 
+      {/* Results Count and Select Controls */}
+      <div className="flex justify-between items-center">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {pagination.totalStudents} {pagination.totalStudents === 1 ? "student" : "students"} found
+        </p>
+        {isSelectMode && (
+          <div className="flex gap-2">
+            <button
+              onClick={selectAll}
+              className="px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600"
+            >
+              Select All
+            </button>
+            <button
+              onClick={clearSelection}
+              className="px-3 py-1 rounded bg-gray-500 text-white hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDeleteSelected}
+              disabled={selected.length === 0}
+              className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
+            >
+              Delete Selected ({selected.length})
+            </button>
+          </div>
+        )}
+      </div>
+
       {/* Student List */}
       <div className="space-y-3 p-4">
         {students.length > 0 ? (
@@ -162,6 +272,10 @@ const ViewAllStudents = () => {
               onRemove={handleRemove}
               onViewDetails={handleViewDetails}
               onViewAttendance={handleViewAttendance}
+              isSelected={selected.includes(student._id)}
+              onToggleSelect={() => toggleSelect(student._id)}
+              onStartSelect={() => toggleSelect(student._id)}
+              isSelectMode={isSelectMode}
             />
           ))
         ) : (
@@ -193,18 +307,26 @@ const ViewAllStudents = () => {
   );
 };
 
-const AddStudent = () => {
+const AddStudent = ({ openModal }) => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   const onSubmit = async (data) => {
-    data.name = data.name.trim().replace(/\b\w/g, (c) => c.toUpperCase()); // Standard format: capitalize each word
-    data.division = data.division.toUpperCase(); // Upper case
+    data.name = data.name.trim().replace(/\b\w/g, (c) => c.toUpperCase());
+    data.division = data.division.toUpperCase();
     try {
       await addStudent(data);
       reset();
-      alert("Student added successfully!");
+      openModal({
+        type: "success",
+        title: "Success",
+        message: "Student added successfully!",
+      });
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      openModal({
+        type: "error",
+        title: "Error",
+        message: error.message || "Failed to add student",
+      });
     }
   };
 
@@ -264,107 +386,21 @@ const AddStudent = () => {
   );
 };
 
-const UpdateStudent = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
-  const [studentId, setStudentId] = useState("");
-
-  const onSubmit = async (data) => {
-    if (!studentId) {
-      alert("Please enter a Student ID.");
-      return;
-    }
-    if (data.name) data.name = data.name.trim().replace(/\b\w/g, (c) => c.toUpperCase()); // Standard format: capitalize each word
-    if (data.division) data.division = data.division.toUpperCase(); // Upper case
-    try {
-      await updateStudent({ id: studentId, formData: data });
-      alert("Student updated successfully!");
-    } catch (error) {
-      alert(`Error: ${error.message}`);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-md mx-auto">
-      <div>
-        <label className="block text-gray-700 dark:text-gray-200">Student ID</label>
-        <input
-          type="text"
-          value={studentId}
-          onChange={(e) => setStudentId(e.target.value)}
-          className="w-full px-3 py-2 border rounded dark:bg-gray-800 dark:text-gray-200"
-          placeholder="Enter Student ID"
-        />
-      </div>
-      <div>
-        <label className="block text-gray-700 dark:text-gray-200">Name</label>
-        <input
-          {...register("name", { minLength: { value: 3, message: "Name must be at least 3 characters" }, maxLength: { value: 100, message: "Name must be at most 100 characters" } })}
-          className="w-full px-3 py-2 border rounded dark:bg-gray-800 dark:text-gray-200"
-        />
-        {errors.name && <p className="text-red-500">{errors.name.message}</p>}
-      </div>
-      <div>
-        <label className="block text-gray-700 dark:text-gray-200">Date of Birth</label>
-        <input
-          type="date"
-          {...register("dob", { validate: value => !value || new Date(value) <= new Date() || "Date of birth cannot be in the future" })}
-          className="w-full px-3 py-2 border rounded dark:bg-gray-800 dark:text-gray-200"
-        />
-        {errors.dob && <p className="text-red-500">{errors.dob.message}</p>}
-      </div>
-      <div>
-        <label className="block text-gray-700 dark:text-gray-200">Grade</label>
-        <select
-          {...register("grade")}
-          className="w-full px-3 py-2 border rounded dark:bg-gray-800 dark:text-gray-200"
-        >
-          <option value="">Select Grade</option>
-          {["playgroup", "nursery", "LKG", "UKG", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"].map((grade) => (
-            <option key={grade} value={grade}>{grade}</option>
-          ))}
-        </select>
-        {errors.grade && <p className="text-red-500">{errors.grade.message}</p>}
-      </div>
-      <div>
-        <label className="block text-gray-700 dark:text-gray-200">Division</label>
-        <select
-          {...register("division")}
-          className="w-full px-3 py-2 border rounded dark:bg-gray-800 dark:text-gray-200"
-        >
-          <option value="">Select Division</option>
-          <option value="A">A</option>
-          <option value="B">B</option>
-          <option value="C">C</option>
-          <option value="D">D</option>
-        </select>
-        {errors.division && <p className="text-red-500">{errors.division.message}</p>}
-      </div>
-      <div>
-        <label className="block text-gray-700 dark:text-gray-200">SID</label>
-        <input
-          {...register("sid")}
-          className="w-full px-3 py-2 border rounded dark:bg-gray-800 dark:text-gray-200"
-        />
-        {errors.sid && <p className="text-red-500">{errors.sid.message}</p>}
-      </div>
-      <button
-        type="submit"
-        className="px-4 py-2 bg-primary-light text-white rounded hover:bg-primary-dark"
-      >
-        Update Student
-      </button>
-    </form>
-  );
-};
-
 function ManageStudents() {
   const [activeTab, setActiveTab] = useState("view");
+  const [modalProps, setModalProps] = useState({ isOpen: false });
+
+  const openModal = (props) => {
+    setModalProps({ isOpen: true, onClose: closeModal, ...props });
+  };
+
+  const closeModal = () => {
+    setModalProps((prev) => ({ ...prev, isOpen: false }));
+  };
 
   const tabs = [
     { id: "add", label: "Add Student" },
-    { id: "update", label: "Update Student" },
     { id: "view", label: "View All Students" },
-    { id: "attendance", label: "Check Attendance" },
   ];
 
   return (
@@ -394,15 +430,11 @@ function ManageStudents() {
 
       {/* Content Area */}
       <div className="md:p-4 rounded-xl bg-gray-50 dark:bg-gray-900 shadow flex-1 overflow-y-auto">
-        {activeTab === "add" && <AddStudent />}
-        {activeTab === "update" && <UpdateStudent />}
-        {activeTab === "view" && <ViewAllStudents />}
-        {activeTab === "attendance" && (
-          <p className="text-gray-800 dark:text-gray-100">
-            Attendance Component will load here.
-          </p>
-        )}
+        {activeTab === "add" && <AddStudent openModal={openModal} />}
+        {activeTab === "view" && <ViewAllStudents openModal={openModal} />}
       </div>
+
+      <NotificationModal {...modalProps} />
     </div>
   );
 }
