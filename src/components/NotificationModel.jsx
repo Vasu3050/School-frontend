@@ -1,9 +1,10 @@
+// NotificationModal.jsx
 import React from 'react';
 
 const NotificationModal = ({ 
   isOpen, 
   onClose, 
-  type = "success", // "success", "error", "warning", "confirm"
+  type = "success",
   title,
   message,
   onConfirm,

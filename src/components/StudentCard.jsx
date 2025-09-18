@@ -1,3 +1,4 @@
+// StudentCard.jsx
 import React, { useState, useRef } from "react";
 
 function StudentCard({
@@ -57,9 +58,20 @@ function StudentCard({
 
   const handleCardClick = (e) => {
     if (isSelectMode) {
-      // Prevent propagation to buttons if any, but since hidden, ok
       onToggleSelect();
     }
+  };
+
+  const calculateAge = (dob) => {
+    if (!dob) return "N/A";
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
   };
 
   return (
@@ -70,11 +82,8 @@ function StudentCard({
       onTouchMove={handleTouchMove}
       onClick={handleCardClick}
     >
-      {/* Selection Checkbox */}
       <div
-        className={`absolute top-2 left-2 w-6 h-6 rounded-full border-2 border-blue-500 bg-white dark:bg-gray-800 flex items-center justify-center cursor-pointer z-10 ${
-          isSelectMode ? "" : "hidden md:flex"
-        }`}
+        className={`absolute top-2 left-2 w-6 h-6 rounded-full border-2 border-blue-500 bg-white dark:bg-gray-800 flex items-center justify-center cursor-pointer z-10 ${isSelectMode ? "" : "hidden"}`}
         onClick={(e) => {
           e.stopPropagation();
           onToggleSelect();
@@ -87,23 +96,18 @@ function StudentCard({
         )}
       </div>
 
-      {/* Top row: avatar + name|SID + actions */}
       <div className="flex items-center gap-3 flex-nowrap">
-        {/* Avatar */}
         <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm sm:text-lg">
           {student.name?.charAt(0) ?? "U"}
         </div>
 
-        {/* Name (big) + '|' + SID (no label) */}
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
-              {/* name truncates if needed */}
               <h3 className="text-base sm:text-xl font-bold truncate">
                 {student.name}
               </h3>
 
-              {/* separator and SID: SID must always be fully visible */}
               <span className="text-xs text-gray-500 dark:text-gray-400 select-none">|</span>
               <span className="text-xs sm:text-sm font-medium flex-shrink-0">
                 {student.sid}
@@ -112,7 +116,6 @@ function StudentCard({
 
             {!isSelectMode && (
               <>
-                {/* Desktop action buttons (hidden on mobile) */}
                 <div className="hidden lg:flex gap-2">
                   <button
                     onClick={handleEdit}
@@ -202,7 +205,6 @@ function StudentCard({
                   </button>
                 </div>
 
-                {/* Mobile menu */}
                 <div className="lg:hidden relative">
                   <button
                     onClick={toggleMenu}
@@ -218,7 +220,7 @@ function StudentCard({
                   {isMenuOpen && (
                     <>
                       <div
-                        className="absolute right-0 top-full mt-2 w-auto min-w-[180px] max-w-[95vw] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 z-50 py-1 bg-opacity-100"
+                        className="absolute right-0 top-full mt-2 w-auto min-w-[180px] max-w-[95vw] bg-white-light dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 z-50 py-1"
                         role="menu"
                       >
                         <button
@@ -273,9 +275,8 @@ function StudentCard({
             )}
           </div>
 
-          {/* compact details row (single visual row on small screens) */}
           <div className="mt-1 flex items-center gap-3 text-xs sm:text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap overflow-hidden">
-            <span className="truncate">Age {student.age ?? "N/A"}</span>
+            <span className="truncate">Age {calculateAge(student.dob)}</span>
             <span className="truncate">• {student.grade}</span>
             <span className="truncate">• Div {student.division}</span>
           </div>
