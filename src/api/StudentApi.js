@@ -20,9 +20,13 @@ export const addStudent = async (formData) => {
 // Update a student by ID
 export const updateStudent = async ({ id, formData, role }) => {
   try {
-    const res = await API.patch(`/students/update-student/${id}`, { ...formData, role }, {
-      withCredentials: true,
-    });
+    const res = await API.patch(
+      `/students/update-student/${id}`,
+      { ...formData, role },
+      {
+        withCredentials: true,
+      }
+    );
     return res.data;
   } catch (err) {
     const backendMsg =
@@ -54,8 +58,7 @@ export const deleteStudent = async (id) => {
 // Get a single student by ID
 export const getStudent = async ({ id, role }) => {
   try {
-    const res = await API.get(`/students/get-student/${id}`, {
-      data: { role },
+    const res = await API.get(`/students/get-student/${id}?role=${role}`, {
       withCredentials: true,
     });
     return res.data;
@@ -70,7 +73,16 @@ export const getStudent = async ({ id, role }) => {
 };
 
 // Get a list of students with optional query parameters
-export const getStudents = async ({ page = 1, limit = 10, name, grade, division, sid, sort = "asc", role }) => {
+export const getStudents = async ({
+  page = 1,
+  limit = 10,
+  name,
+  grade,
+  division,
+  sid,
+  sort = "asc",
+  role,
+}) => {
   try {
     const params = new URLSearchParams({ page, limit, sort, role });
     if (name) params.append("name", name);

@@ -1,6 +1,6 @@
 // ViewAllStudents.jsx
 import React, { useState, useEffect } from "react";
-import { getStudents, deleteStudent, updateStudent } from "../api/StudentApi.js";
+import { getStudents, deleteStudent } from "../api/StudentApi.js";
 import StudentCard from "./StudentCard.jsx";
 
 const ViewAllStudents = ({ openModal, setSelectedStudentId, setInitialMode }) => {
@@ -36,6 +36,7 @@ const ViewAllStudents = ({ openModal, setSelectedStudentId, setInitialMode }) =>
         totalStudents: response.data.totalStudents || 0,
       });
     } catch (error) {
+      console.error("Fetch students error:", error);
       openModal({
         type: "error",
         title: "Error",
@@ -57,9 +58,9 @@ const ViewAllStudents = ({ openModal, setSelectedStudentId, setInitialMode }) =>
       }
       const num = parseInt(value, 10);
       if (!isNaN(num)) {
-        value = 'sid' + num.toString().padStart(2, "0");
+        value = "sid" + num.toString().padStart(2, "0");
       } else {
-        value = '';
+        value = "";
       }
     }
     setFilters({ ...filters, [e.target.name]: value });
@@ -85,7 +86,7 @@ const ViewAllStudents = ({ openModal, setSelectedStudentId, setInitialMode }) =>
     setSelected([]);
   };
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
     openModal({
       type: "confirm",
       title: "Confirm Delete",
@@ -93,8 +94,11 @@ const ViewAllStudents = ({ openModal, setSelectedStudentId, setInitialMode }) =>
       confirmText: "Yes, Delete",
       onConfirm: async () => {
         try {
-          await Promise.all(selected.map((id) => deleteStudent(id)));
-          fetchStudents(pagination.currentPage);
+          // Queue delete requests sequentially
+          for (const id of selected) {
+            await deleteStudent(id);
+          }
+          await fetchStudents(pagination.currentPage);
           openModal({
             type: "success",
             title: "Success",
@@ -102,6 +106,7 @@ const ViewAllStudents = ({ openModal, setSelectedStudentId, setInitialMode }) =>
           });
           clearSelection();
         } catch (error) {
+          console.error("Delete selected error:", error);
           openModal({
             type: "error",
             title: "Error",
@@ -112,27 +117,24 @@ const ViewAllStudents = ({ openModal, setSelectedStudentId, setInitialMode }) =>
     });
   };
 
-  const handleEdit = (student) => {
-    setSelectedStudentId(student._id);
-    setInitialMode("edit");
-  };
-
   const handleRemove = (student) => {
     openModal({
       type: "confirm",
       title: "Delete Student",
-      message: `Delete ${student.name} (${student.sid}) only or select multiple to delete?`,
+      message: `Delete ${student.name} (${student.sid}) only, select multiple, or cancel?`,
       confirmText: "Delete Only This",
+      cancelText: "Cancel",
       onConfirm: async () => {
         try {
           await deleteStudent(student._id);
-          fetchStudents(pagination.currentPage);
+          await fetchStudents(pagination.currentPage);
           openModal({
             type: "success",
             title: "Success",
             message: "Student deleted successfully!",
           });
         } catch (error) {
+          console.error("Delete student error:", error);
           openModal({
             type: "error",
             title: "Error",
@@ -147,12 +149,20 @@ const ViewAllStudents = ({ openModal, setSelectedStudentId, setInitialMode }) =>
     });
   };
 
+  const handleEdit = (student) => {
+    console.log("Navigating to edit for student:", student._id);
+    setSelectedStudentId(student._id);
+    setInitialMode("edit");
+  };
+
   const handleViewDetails = (student) => {
+    console.log("Navigating to details for student:", student._id);
     setSelectedStudentId(student._id);
     setInitialMode("details");
   };
 
   const handleViewAttendance = (student) => {
+    console.log("Navigating to attendance for student:", student._id);
     setSelectedStudentId(student._id);
     setInitialMode("attendance");
   };
@@ -174,7 +184,7 @@ const ViewAllStudents = ({ openModal, setSelectedStudentId, setInitialMode }) =>
           onClick={() => handlePageChange(i)}
           className={`px-3 py-1 mx-1 rounded ${
             pagination.currentPage === i
-              ? "bg-blue-500 text-white"
+              ? "bg-blue-500 text-white-primary"
               : "bg-gray-200 dark:bg-gray-700"
           }`}
         >
@@ -248,20 +258,20 @@ const ViewAllStudents = ({ openModal, setSelectedStudentId, setInitialMode }) =>
           <div className="flex gap-2">
             <button
               onClick={selectAll}
-              className="px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600 text-sm"
+              className="px-3 py-1 rounded bg-blue-500 text-white-primary hover:bg-blue-600 text-sm"
             >
               Select All
             </button>
             <button
               onClick={clearSelection}
-              className="px-3 py-1 rounded bg-gray-500 text-white hover:bg-gray-600 text-sm"
+              className="px-3 py-1 rounded bg-gray-500 text-white-primary hover:bg-gray-600 text-sm"
             >
               Cancel
             </button>
             <button
               onClick={handleDeleteSelected}
               disabled={selected.length === 0}
-              className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 text-sm"
+              className="px-3 py-1 rounded bg-red-500 text-white-primary hover:bg-red-600 disabled:opacity-50 text-sm"
             >
               Delete Selected ({selected.length})
             </button>

@@ -1,4 +1,4 @@
-// ManageStudents.jsx
+// ManageStudents.jsx (Unchanged - already handles loading StudentDashboard)
 import React, { useState } from "react";
 import ViewAllStudents from "../../components/ViewAllStudents.jsx";
 import AddStudent from "../../components/AddStudent.jsx";

@@ -28,14 +28,17 @@ function StudentCard({
     onEdit(student);
     closeMenu();
   };
+
   const handleRemove = () => {
-    onRemove(student);
+    onRemove(student); // This triggers the modal with single/multiple/cancel options
     closeMenu();
   };
+
   const handleViewDetails = () => {
     onViewDetails(student);
     closeMenu();
   };
+
   const handleViewAttendance = () => {
     onViewAttendance(student);
     closeMenu();
@@ -83,7 +86,7 @@ function StudentCard({
       onClick={handleCardClick}
     >
       <div
-        className={`absolute top-2 left-2 w-6 h-6 rounded-full border-2 border-blue-500 bg-white dark:bg-gray-800 flex items-center justify-center cursor-pointer z-10 ${isSelectMode ? "" : "hidden"}`}
+        className={`absolute top-2 left-2 w-6 h-6 rounded-full border-2 border-blue-500 bg-white-primary dark:bg-gray-800 flex items-center justify-center cursor-pointer z-10 ${isSelectMode ? "" : "hidden"}`}
         onClick={(e) => {
           e.stopPropagation();
           onToggleSelect();
@@ -97,21 +100,16 @@ function StudentCard({
       </div>
 
       <div className="flex items-center gap-3 flex-nowrap">
-        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm sm:text-lg">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white-primary font-bold text-sm sm:text-lg">
           {student.name?.charAt(0) ?? "U"}
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
-              <h3 className="text-base sm:text-xl font-bold truncate">
-                {student.name}
-              </h3>
-
+              <h3 className="text-base sm:text-xl font-bold truncate">{student.name}</h3>
               <span className="text-xs text-gray-500 dark:text-gray-400 select-none">|</span>
-              <span className="text-xs sm:text-sm font-medium flex-shrink-0">
-                {student.sid}
-              </span>
+              <span className="text-xs sm:text-sm font-medium flex-shrink-0">{student.sid}</span>
             </div>
 
             {!isSelectMode && (
@@ -120,7 +118,8 @@ function StudentCard({
                   <button
                     onClick={handleEdit}
                     title="Edit"
-                    className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-sm"
+                    className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white-primary shadow-sm disabled:opacity-50"
+                    disabled={isSelectMode}
                   >
                     <svg
                       className="h-5 w-5"
@@ -141,7 +140,7 @@ function StudentCard({
                   <button
                     onClick={handleRemove}
                     title="Remove"
-                    className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-sm"
+                    className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white-primary shadow-sm"
                   >
                     <svg
                       className="h-5 w-5"
@@ -161,7 +160,8 @@ function StudentCard({
                   <button
                     onClick={handleViewDetails}
                     title="View"
-                    className="p-2 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-sm"
+                    className="p-2 rounded-full bg-green-500 hover:bg-green-600 text-white-primary shadow-sm disabled:opacity-50"
+                    disabled={isSelectMode}
                   >
                     <svg
                       className="h-5 w-5"
@@ -187,7 +187,8 @@ function StudentCard({
                   <button
                     onClick={handleViewAttendance}
                     title="Attendance"
-                    className="p-2 rounded-full bg-purple-500 hover:bg-purple-600 text-white shadow-sm"
+                    className="p-2 rounded-full bg-purple-500 hover:bg-purple-600 text-white-primary shadow-sm disabled:opacity-50"
+                    disabled={isSelectMode}
                   >
                     <svg
                       className="h-5 w-5"
@@ -208,11 +209,11 @@ function StudentCard({
                 <div className="lg:hidden relative">
                   <button
                     onClick={toggleMenu}
-                    className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white"
+                    className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white-primary"
                     aria-label="More options"
                     title="More"
                   >
-                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="h-5 w-5 text-gray-800 dark:text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                     </svg>
                   </button>
@@ -220,12 +221,13 @@ function StudentCard({
                   {isMenuOpen && (
                     <>
                       <div
-                        className="absolute right-0 top-full mt-2 w-auto min-w-[180px] max-w-[95vw] bg-white-light dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 z-50 py-1"
+                        className="absolute right-0 top-full mt-2 w-auto min-w-[180px] max-w-[95vw] bg-white-primary dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 z-50 py-1"
                         role="menu"
                       >
                         <button
                           onClick={handleEdit}
-                          className="flex items-center gap-3 w-full px-4 py-2 text-left hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-800 dark:text-gray-100"
+                          className="flex items-center gap-3 w-full px-4 py-2 text-left hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-800 dark:text-gray-100 disabled:opacity-50"
+                          disabled={isSelectMode}
                         >
                           <svg className="h-4 w-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -235,7 +237,8 @@ function StudentCard({
 
                         <button
                           onClick={handleViewDetails}
-                          className="flex items-center gap-3 w-full px-4 py-2 text-left hover:bg-green-50 dark:hover:bg-green-900/20 text-gray-800 dark:text-gray-100"
+                          className="flex items-center gap-3 w-full px-4 py-2 text-left hover:bg-green-50 dark:hover:bg-green-900/20 text-gray-800 dark:text-gray-100 disabled:opacity-50"
+                          disabled={isSelectMode}
                         >
                           <svg className="h-4 w-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -246,7 +249,8 @@ function StudentCard({
 
                         <button
                           onClick={handleViewAttendance}
-                          className="flex items-center gap-3 w-full px-4 py-2 text-left hover:bg-purple-50 dark:hover:bg-purple-900/20 text-gray-800 dark:text-gray-100"
+                          className="flex items-center gap-3 w-full px-4 py-2 text-left hover:bg-purple-50 dark:hover:bg-purple-900/20 text-gray-800 dark:text-gray-100 disabled:opacity-50"
+                          disabled={isSelectMode}
                         >
                           <svg className="h-4 w-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />

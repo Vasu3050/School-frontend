@@ -1,4 +1,4 @@
-// StudentDashboard.jsx
+// StudentDashboard.jsx (Modified)
 import React, { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { getStudent, updateStudent, deleteStudent } from "../api/StudentApi.js";
@@ -131,7 +131,7 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
     while (currentDate <= endDate) {
       const day = currentDate.getDay();
       let color;
-      if (day === 0) {
+      if (day === 0) {  // Sunday = holiday (blue)
         color = "bg-blue-500 dark:bg-blue-600";
       } else {
         color = Math.random() > 0.2 ? "bg-green-500 dark:bg-green-600" : "bg-red-500 dark:bg-red-600";
@@ -142,25 +142,27 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
     return data;
   };
 
-  const quarters = [
-    { name: "Q1 (Jan-Mar)", data: generateAttendanceData("2025-01-01", "2025-03-31") },
-    { name: "Q2 (Apr-Jun)", data: generateAttendanceData("2025-04-01", "2025-06-30") },
-    { name: "Q3 (Jul-Sep)", data: generateAttendanceData("2025-07-01", "2025-09-30") },
-    { name: "Q4 (Oct-Dec)", data: generateAttendanceData("2025-10-01", "2025-12-31") },
+  // Generate dummy data for last 4 months (June to September 2025, based on current date Sep 20, 2025)
+  // Adjust end date for September to current date
+  const months = [
+    { name: "June 2025", data: generateAttendanceData("2025-06-01", "2025-06-30") },
+    { name: "July 2025", data: generateAttendanceData("2025-07-01", "2025-07-31") },
+    { name: "August 2025", data: generateAttendanceData("2025-08-01", "2025-08-31") },
+    { name: "September 2025", data: generateAttendanceData("2025-09-01", "2025-09-20") },
   ];
 
-  const allData = quarters.flatMap(q => q.data);
+  const allData = months.flatMap(q => q.data);
   const totalDays = allData.length;
   const presentCount = allData.filter(d => d.color.startsWith("bg-green")).length;
   const absentCount = allData.filter(d => d.color.startsWith("bg-red")).length;
   const holidayCount = allData.filter(d => d.color.startsWith("bg-blue")).length;
   const presentPercent = totalDays - holidayCount > 0 ? ((presentCount / (totalDays - holidayCount)) * 100).toFixed(1) : 0;
 
-  const today = new Date("2025-09-18");
+  const today = new Date("2025-09-20");
   const todayData = allData.find(d => d.date.toDateString() === today.toDateString());
   const presentToday = todayData?.color.startsWith("bg-green");
 
-  const renderQuarterGrid = (data) => {
+  const renderMonthGrid = (data) => {
     const weeks = Math.ceil(data.length / 7);
     const grid = [];
     for (let week = 0; week < weeks; week++) {
@@ -185,7 +187,7 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
       <div className="flex justify-between items-center">
         <button
           onClick={onBack}
-          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-sm"
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white-primary rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-sm"
         >
           Back
         </button>
@@ -193,7 +195,7 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
           <button
             onClick={() => setIsEditing(!isEditing)}
             title="Edit"
-            className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-sm"
+            className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white-primary shadow-sm"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -202,7 +204,7 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
           <button
             onClick={handleDelete}
             title="Delete"
-            className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-sm"
+            className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white-primary shadow-sm"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -211,7 +213,7 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
           <button
             onClick={() => attendanceRef.current.scrollIntoView({ behavior: "smooth" })}
             title="Attendance"
-            className="p-2 rounded-full bg-purple-500 hover:bg-purple-600 text-white shadow-sm"
+            className="p-2 rounded-full bg-purple-500 hover:bg-purple-600 text-white-primary shadow-sm"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
@@ -221,7 +223,7 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
       </div>
 
       <div className="border-b pb-4">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Student Details</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white-primary mb-2">Student Details</h2>
         {isEditing ? (
           <form onSubmit={handleSubmit(handleUpdate)} className="space-y-4">
             <div>
@@ -268,7 +270,7 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
               </select>
               {errors.division && <p className="text-red-500 text-xs">{errors.division.message}</p>}
             </div>
-            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">Update</button>
+            <button type="submit" className="px-4 py-2 bg-blue-500 text-white-primary rounded hover:bg-blue-600 text-sm">Update</button>
           </form>
         ) : (
           <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
@@ -284,13 +286,23 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
       </div>
 
       <div className="border-b pb-4">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Parent Details</h2>
-        <p className="text-sm text-gray-700 dark:text-gray-300">Parent ID: {student.parentId || "N/A"}</p>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Parent details will be fetched here once API is integrated.</p>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white-primary mb-2">Parent Details</h2>
+        {student.parent && student.parent.length > 0 ? (
+          <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+            {student.parent.map((p, index) => (
+              <p key={index}>
+                <span className="font-medium">Parent {index + 1}:</span> {p.name || "N/A"} ({p.email || "N/A"})
+              </p>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-700 dark:text-gray-300">No parent details available.</p>
+        )}
+        <p className="text-sm text-gray-500 dark:text-gray-400">Parent details are populated from dummy data (API integration pending).</p>
       </div>
 
       <div ref={attendanceRef}>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Attendance</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white-primary mb-2">Attendance (Last 4 Months)</h2>
         <div className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-700 dark:text-gray-300">
             <p><span className="font-medium">Active:</span> Yes</p>
@@ -309,10 +321,10 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
             </div>
           </div>
           <div className="space-y-6 overflow-x-auto pb-2">
-            {quarters.map((quarter, i) => (
+            {months.map((month, i) => (
               <div key={i}>
-                <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">{quarter.name}</h3>
-                {renderQuarterGrid(quarter.data)}
+                <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">{month.name}</h3>
+                {renderMonthGrid(month.data)}
               </div>
             ))}
           </div>

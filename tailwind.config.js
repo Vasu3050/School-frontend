@@ -56,10 +56,10 @@ export default {
           dark: "#166534"    // Dark Green 800
         },
 
-        white: {
-          light: "#ffffff",  // Pure White
-          dark: "#f9fafb"    // Off White / Light Gray
-        },
+        // white: {
+        //   light: "#ffffff",  // Pure White
+        //   dark: "#f9fafb"    // Off White / Light Gray
+        // },
 
         black: {
           light: "#111827",  // Very Dark Gray (almost black)
