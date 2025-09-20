@@ -55,18 +55,38 @@ export const deleteStudent = async (id) => {
   }
 };
 
-// Get a single student by ID
+// FIXED: Get a single student by ID with better error handling and response parsing
 export const getStudent = async ({ id, role }) => {
   try {
+    console.log("API: Fetching student with ID:", id, "role:", role);
+    
+    if (!id || !role) {
+      throw new Error("Student ID and role are required");
+    }
+    
     const res = await API.get(`/students/get-student/${id}?role=${role}`, {
       withCredentials: true,
     });
-    return res.data;
+    
+    console.log("API: Student fetch response:", res.data);
+    
+    // Handle different response structures
+    if (res.data && res.data.data && res.data.data.student) {
+      return res.data.data; // Standard API response with nested data
+    } else if (res.data && res.data.student) {
+      return res.data; // Direct student in response
+    } else if (res.data) {
+      return { student: res.data }; // Wrap response as student
+    } else {
+      throw new Error("Invalid response structure from server");
+    }
   } catch (err) {
+    console.error("API: Get student error:", err);
     const backendMsg =
       err.response?.data?.message ||
       err.response?.data?.error ||
       err.response?.statusText ||
+      err.message ||
       "Unknown error";
     throw new Error(`${backendMsg} (status ${err.response?.status || "?"})`);
   }

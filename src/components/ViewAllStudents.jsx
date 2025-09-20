@@ -1,4 +1,4 @@
-// ViewAllStudents.jsx
+// ViewAllStudents.jsx (FIXED)
 import React, { useState, useEffect } from "react";
 import { getStudents, deleteStudent } from "../api/StudentApi.js";
 import StudentCard from "./StudentCard.jsx";
@@ -149,20 +149,30 @@ const ViewAllStudents = ({ openModal, setSelectedStudentId, setInitialMode }) =>
     });
   };
 
+  // FIXED: These handlers now properly call the parent component functions
   const handleEdit = (student) => {
     console.log("Navigating to edit for student:", student._id);
+    // Clear any existing selection first
+    setSelected([]);
+    // Set the student ID and mode
     setSelectedStudentId(student._id);
     setInitialMode("edit");
   };
 
   const handleViewDetails = (student) => {
     console.log("Navigating to details for student:", student._id);
+    // Clear any existing selection first
+    setSelected([]);
+    // Set the student ID and mode
     setSelectedStudentId(student._id);
     setInitialMode("details");
   };
 
   const handleViewAttendance = (student) => {
     console.log("Navigating to attendance for student:", student._id);
+    // Clear any existing selection first
+    setSelected([]);
+    // Set the student ID and mode
     setSelectedStudentId(student._id);
     setInitialMode("attendance");
   };

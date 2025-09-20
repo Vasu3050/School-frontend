@@ -1,4 +1,4 @@
-// StudentDashboard.jsx (Modified)
+// StudentDashboard.jsx (COMPLETE AND FIXED)
 import React, { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { getStudent, updateStudent, deleteStudent } from "../api/StudentApi.js";
@@ -6,6 +6,7 @@ import { getStudent, updateStudent, deleteStudent } from "../api/StudentApi.js";
 const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
   const [student, setStudent] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const attendanceRef = useRef(null);
 
@@ -17,15 +18,23 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
           title: "Invalid Request",
           message: "Invalid student ID provided.",
         });
+        setLoading(false);
         return;
       }
 
       try {
+        setLoading(true);
+        console.log("Fetching student with ID:", id);
+        
         const response = await getStudent({ id, role: "admin" });
-        const studentData = response?.student || response;
+        console.log("Student fetch response:", response);
+        
+        const studentData = response?.data?.student || response?.student || response;
+        
         if (!studentData || !studentData._id) {
           throw new Error("Invalid student data received.");
         }
+        
         setStudent(studentData);
         reset({
           name: studentData.name || "",
@@ -33,8 +42,11 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
           grade: studentData.grade || "",
           division: studentData.division || "",
         });
+        
+        setLoading(false);
       } catch (error) {
         console.error("Fetch student error:", error);
+        setLoading(false);
         openModal({
           type: "error",
           title: "Error",
@@ -42,19 +54,22 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
         });
       }
     };
+    
     fetchStudent();
   }, [id, reset, openModal]);
 
   useEffect(() => {
-    if (student && student._id) {
+    if (student && student._id && !loading) {
       if (initialMode === "edit") {
         setIsEditing(true);
       }
       if (initialMode === "attendance" && attendanceRef.current) {
-        attendanceRef.current.scrollIntoView({ behavior: "smooth" });
+        setTimeout(() => {
+          attendanceRef.current.scrollIntoView({ behavior: "smooth" });
+        }, 100);
       }
     }
-  }, [student, initialMode]);
+  }, [student, initialMode, loading]);
 
   const calculateAge = (dob) => {
     if (!dob) return "N/A";
@@ -74,7 +89,7 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
       await updateStudent({ id, formData: data, role: "admin" });
       setIsEditing(false);
       const response = await getStudent({ id, role: "admin" });
-      const studentData = response?.student || response;
+      const studentData = response?.data?.student || response?.student || response;
       setStudent(studentData);
       reset({
         name: studentData.name || "",
@@ -98,10 +113,12 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
   };
 
   const handleDelete = () => {
+    if (!student) return; // Guard clause
+    
     openModal({
       type: "confirm",
       title: "Confirm Delete",
-      message: `Are you sure you want to delete ${student.name} (${student.sid})? This action cannot be undone.`,
+      message: `Are you sure you want to delete ${student.name || 'this student'} (${student.sid || 'N/A'})? This action cannot be undone.`,
       confirmText: "Yes, Delete",
       onConfirm: async () => {
         try {
@@ -124,6 +141,34 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
     });
   };
 
+  // Early return if still loading
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+          <p className="text-gray-700 dark:text-gray-300">Loading student details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Early return if no student data
+  if (!student) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-600 dark:text-red-400">Failed to load student details.</p>
+        <button
+          onClick={onBack}
+          className="mt-4 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white-primary rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-sm"
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
+
+  // Generate attendance data only after we have student data
   const generateAttendanceData = (start, end) => {
     const data = [];
     let currentDate = new Date(start);
@@ -180,14 +225,37 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
     );
   };
 
-  if (!student) return <div className="text-center py-4 text-gray-700 dark:text-gray-300">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+          <p className="text-gray-700 dark:text-gray-300">Loading student details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!student) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-600 dark:text-red-400">Failed to load student details.</p>
+        <button
+          onClick={onBack}
+          className="mt-4 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white-primary rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-sm"
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-xl shadow">
       <div className="flex justify-between items-center">
         <button
           onClick={onBack}
-          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white-primary rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-sm"
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white-light rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-sm"
         >
           Back
         </button>
@@ -270,28 +338,37 @@ const StudentDashboard = ({ id, initialMode, onBack, openModal }) => {
               </select>
               {errors.division && <p className="text-red-500 text-xs">{errors.division.message}</p>}
             </div>
-            <button type="submit" className="px-4 py-2 bg-blue-500 text-white-primary rounded hover:bg-blue-600 text-sm">Update</button>
+            <div className="flex gap-2">
+              <button type="submit" className="px-4 py-2 bg-blue-500 text-white-primary rounded hover:bg-blue-600 text-sm">Update</button>
+              <button 
+                type="button" 
+                onClick={() => setIsEditing(false)}
+                className="px-4 py-2 bg-gray-500 text-white-primary rounded hover:bg-gray-600 text-sm"
+              >
+                Cancel
+              </button>
+            </div>
           </form>
         ) : (
           <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
-            <p><span className="font-medium">Name:</span> {student.name || "N/A"}</p>
-            <p><span className="font-medium">SID:</span> {student.sid || "N/A"}</p>
-            <p><span className="font-medium">Age:</span> {calculateAge(student.dob)}</p>
-            <p><span className="font-medium">Grade:</span> {student.grade || "N/A"}</p>
-            <p><span className="font-medium">Division:</span> {student.division || "N/A"}</p>
-            <p><span className="font-medium">Created:</span> {student.createdAt ? new Date(student.createdAt).toLocaleString() : "N/A"}</p>
-            <p><span className="font-medium">Updated:</span> {student.updatedAt ? new Date(student.updatedAt).toLocaleString() : "N/A"}</p>
+            <p><span className="font-medium">Name:</span> {student?.name || "N/A"}</p>
+            <p><span className="font-medium">SID:</span> {student?.sid || "N/A"}</p>
+            <p><span className="font-medium">Age:</span> {calculateAge(student?.dob)}</p>
+            <p><span className="font-medium">Grade:</span> {student?.grade || "N/A"}</p>
+            <p><span className="font-medium">Division:</span> {student?.division || "N/A"}</p>
+            <p><span className="font-medium">Created:</span> {student?.createdAt ? new Date(student.createdAt).toLocaleString() : "N/A"}</p>
+            <p><span className="font-medium">Updated:</span> {student?.updatedAt ? new Date(student.updatedAt).toLocaleString() : "N/A"}</p>
           </div>
         )}
       </div>
 
       <div className="border-b pb-4">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white-primary mb-2">Parent Details</h2>
-        {student.parent && student.parent.length > 0 ? (
+        {student?.parent && Array.isArray(student.parent) && student.parent.length > 0 ? (
           <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
             {student.parent.map((p, index) => (
               <p key={index}>
-                <span className="font-medium">Parent {index + 1}:</span> {p.name || "N/A"} ({p.email || "N/A"})
+                <span className="font-medium">Parent {index + 1}:</span> {p?.name || "N/A"} ({p?.email || "N/A"})
               </p>
             ))}
           </div>
