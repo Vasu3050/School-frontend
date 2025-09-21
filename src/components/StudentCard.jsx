@@ -187,7 +187,7 @@ function StudentCard({
                   <button
                     onClick={handleViewAttendance}
                     title="Attendance"
-                    className="p-2 rounded-full bg-purple-500 hover:bg-purple-600 text-white-primary shadow-sm disabled:opacity-50"
+                    className="p-2 rounded-full bg-purple-500 hover:bg-purple-600 text-white-light shadow-sm disabled:opacity-50"
                     disabled={isSelectMode}
                   >
                     <svg
@@ -209,11 +209,11 @@ function StudentCard({
                 <div className="lg:hidden relative">
                   <button
                     onClick={toggleMenu}
-                    className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white-primary"
+                    className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white-dark"
                     aria-label="More options"
                     title="More"
                   >
-                    <svg className="h-5 w-5 text-gray-800 dark:text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="h-5 w-5 text-gray-800 dark:text-white-light" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                     </svg>
                   </button>

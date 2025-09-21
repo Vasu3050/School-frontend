@@ -3,9 +3,7 @@ import API from "./Axios.js";
 // Add a new student
 export const addStudent = async (formData) => {
   try {
-    const res = await API.post("/students/add-student", formData, {
-      withCredentials: true,
-    });
+    const res = await API.post("/students/add-student", formData);
     return res.data;
   } catch (err) {
     const backendMsg =
@@ -22,10 +20,7 @@ export const updateStudent = async ({ id, formData, role }) => {
   try {
     const res = await API.patch(
       `/students/update-student/${id}`,
-      { ...formData, role },
-      {
-        withCredentials: true,
-      }
+      { ...formData, role }
     );
     return res.data;
   } catch (err) {
@@ -41,9 +36,7 @@ export const updateStudent = async ({ id, formData, role }) => {
 // Delete a student by ID
 export const deleteStudent = async (id) => {
   try {
-    const res = await API.delete(`/students/delete-student/${id}`, {
-      withCredentials: true,
-    });
+    const res = await API.delete(`/students/delete-student/${id}`);
     return res.data;
   } catch (err) {
     const backendMsg =
@@ -55,33 +48,26 @@ export const deleteStudent = async (id) => {
   }
 };
 
-// FIXED: Get a single student by ID with better error handling and response parsing
+// Get a single student by ID
 export const getStudent = async ({ id, role }) => {
   try {
-    console.log("API: Fetching student with ID:", id, "role:", role);
-    
     if (!id || !role) {
       throw new Error("Student ID and role are required");
     }
     
-    const res = await API.get(`/students/get-student/${id}?role=${role}`, {
-      withCredentials: true,
-    });
-    
-    console.log("API: Student fetch response:", res.data);
+    const res = await API.get(`/students/get-student/${id}?role=${role}`);
     
     // Handle different response structures
     if (res.data && res.data.data && res.data.data.student) {
-      return res.data.data; // Standard API response with nested data
+      return res.data.data;
     } else if (res.data && res.data.student) {
-      return res.data; // Direct student in response
+      return res.data;
     } else if (res.data) {
-      return { student: res.data }; // Wrap response as student
+      return { student: res.data };
     } else {
       throw new Error("Invalid response structure from server");
     }
   } catch (err) {
-    console.error("API: Get student error:", err);
     const backendMsg =
       err.response?.data?.message ||
       err.response?.data?.error ||
@@ -92,7 +78,7 @@ export const getStudent = async ({ id, role }) => {
   }
 };
 
-// Get a list of students with optional query parameters
+// Get list of students with filters
 export const getStudents = async ({
   page = 1,
   limit = 10,
@@ -110,9 +96,7 @@ export const getStudents = async ({
     if (division) params.append("division", division);
     if (sid) params.append("sid", sid);
 
-    const res = await API.get(`/students/get-students?${params.toString()}`, {
-      withCredentials: true,
-    });
+    const res = await API.get(`/students/get-students?${params.toString()}`);
     return res.data;
   } catch (err) {
     const backendMsg =
