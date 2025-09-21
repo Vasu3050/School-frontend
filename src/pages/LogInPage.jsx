@@ -50,13 +50,24 @@ export default function Login() {
         })
       );
 
-      if (user.roles.includes("admin") && formData.role === "admin") navigate("/admin");
-      else if (user.roles.includes("teacher") && formData.role === "teacher") navigate("/teacher");
-      else if (user.roles.includes("parent") && formData.role === "parent") navigate("/parent");
-      else navigate("/");
+      // FIXED: Allow navigation regardless of status
+      // Navigate based on role, not status
+      if (user.roles.includes("admin") && formData.role === "admin") {
+        navigate("/admin");
+      } else if (user.roles.includes("teacher") && formData.role === "teacher") {
+        navigate("/teacher");
+      } else if (user.roles.includes("parent") && formData.role === "parent") {
+        navigate("/parent");
+      } else {
+        navigate("/");
+      }
     },
     onError: (error) => {
-      alert(error.response?.data?.message || error.message || "Login failed");
+      console.error("Login error:", error);
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          "Login failed";
+      alert(errorMessage);
     },
   });
 

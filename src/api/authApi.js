@@ -84,9 +84,13 @@ export const updateUser = async (formData) => {
   }
 };
 
-export const getPendingUsers = async (formData) => {
+// Fixed: Get pending users with correct API call structure
+export const getPendingUsers = async ({ candiRole }) => {
   try {
-    const res = await API.get("/users/pending", { data: formData });
+    const res = await API.post("/users/pending", { 
+      role: "admin", 
+      candiRole: candiRole 
+    });
     return res.data;
   } catch (error) {
     const backendMsg =
@@ -95,6 +99,42 @@ export const getPendingUsers = async (formData) => {
       error.response?.statusText ||
       "Unknown error";
     throw new Error(`${backendMsg} (status ${error.response?.status || "?"})`);    
+  }
+};
+
+// New: Get total pending count (both teachers and parents)
+export const getPendingCount = async () => {
+  try {
+    // Get both teacher and parent pending counts using POST requests
+    const [teacherRes, parentRes] = await Promise.allSettled([
+      API.post("/users/pending", { role: "admin", candiRole: "teacher" }),
+      API.post("/users/pending", { role: "admin", candiRole: "parent" })
+    ]);
+    
+    // Handle teacher response
+    let teacherCount = 0;
+    if (teacherRes.status === 'fulfilled') {
+      teacherCount = teacherRes.value?.data?.data?.pendingUsers?.length || 0;
+    } else {
+      console.log("Teacher pending fetch failed:", teacherRes.reason);
+    }
+    
+    // Handle parent response  
+    let parentCount = 0;
+    if (parentRes.status === 'fulfilled') {
+      parentCount = parentRes.value?.data?.data?.pendingUsers?.length || 0;
+    } else {
+      console.log("Parent pending fetch failed:", parentRes.reason);
+    }
+    
+    return {
+      count: teacherCount + parentCount,
+      teacherCount,
+      parentCount
+    };
+  } catch (error) {
+    console.error("Error fetching pending count:", error);
+    return { count: 0, teacherCount: 0, parentCount: 0 };
   }
 };
 

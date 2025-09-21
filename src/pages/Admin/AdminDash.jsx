@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { PendingCountContext } from "../../layouts/adminLayout.jsx";
 
 export default function AdminDash() {
   const navigate = useNavigate();
+  const { pendingCount } = useContext(PendingCountContext);
 
   // Mock user & stats (replace with API calls)
   const [user, setUser] = useState({
@@ -13,7 +15,6 @@ export default function AdminDash() {
     role: "Admin",
   });
 
-  const [pendingCount, setPendingCount] = useState(5); // from API
   const [academicYear, setAcademicYear] = useState("2024-25"); // from API
   const [newPassword, setNewPassword] = useState("");
 
@@ -156,7 +157,7 @@ export default function AdminDash() {
                 Quick Stats
               </h3>
               <div className="space-y-4">
-                <div onClick={() => navigate("/admin/students")} className="bg-blue-50 dark:bg-blue-dark/30 p-4 rounded-lg border border-blue-100 dark:border-blue-dark">
+                <div onClick={() => navigate("/admin/students")} className="cursor-pointer bg-blue-50 dark:bg-blue-dark/30 p-4 rounded-lg border border-blue-100 dark:border-blue-dark hover:bg-blue-100 dark:hover:bg-blue-dark/50 transition-colors">
                   <div className="text-3xl font-bold text-blue-light dark:text-blue-dark">
                     24
                   </div>
@@ -166,7 +167,7 @@ export default function AdminDash() {
                 </div>
                 <div 
                 onClick={() => navigate("/admin/staff")}
-                className="bg-green-50 dark:bg-green-dark/30 p-4 rounded-lg border border-green-100 dark:border-green-dark">
+                className="cursor-pointer bg-green-50 dark:bg-green-dark/30 p-4 rounded-lg border border-green-100 dark:border-green-dark hover:bg-green-100 dark:hover:bg-green-dark/50 transition-colors">
                   <div className="text-3xl font-bold text-green-light dark:text-green-dark">
                     8
                   </div>
@@ -174,9 +175,7 @@ export default function AdminDash() {
                     Staff Members
                   </div>
                 </div>
-                <div 
-                 
-                className="bg-purple-50 dark:bg-pink-dark/30 p-4 rounded-lg border border-purple-100 dark:border-pink-dark">
+                <div className="bg-purple-50 dark:bg-pink-dark/30 p-4 rounded-lg border border-purple-100 dark:border-pink-dark">
                   <div className="text-3xl font-bold text-pink-light dark:text-pink-dark">
                     16
                   </div>
@@ -185,10 +184,10 @@ export default function AdminDash() {
                   </div>
                 </div>
 
-                {/* Pending Users */}
+                {/* Pending Users - Now using real-time count */}
                 <div
                   onClick={() => navigate("/admin/approve-users")}
-                  className="cursor-pointer bg-yellow-50 dark:bg-yellow-800/30 p-4 rounded-lg border border-yellow-100 dark:border-yellow-700 hover:bg-yellow-100 dark:hover:bg-yellow-800 transition"
+                  className="cursor-pointer bg-yellow-50 dark:bg-yellow-800/30 p-4 rounded-lg border border-yellow-100 dark:border-yellow-700 hover:bg-yellow-100 dark:hover:bg-yellow-800 transition relative"
                 >
                   <div className="text-3xl font-bold text-yellow-500 dark:text-yellow-400">
                     {pendingCount}
@@ -196,6 +195,13 @@ export default function AdminDash() {
                   <div className="text-sm text-text-secondaryLight dark:text-text-secondaryDark">
                     Pending Users
                   </div>
+                  
+                  {/* Pulsing indicator when there are pending users */}
+                  {pendingCount > 0 && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse">
+                      <div className="absolute inset-0 w-4 h-4 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

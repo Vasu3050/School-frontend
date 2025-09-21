@@ -1,42 +1,48 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
+
 const initialState = {
-  name: null,
-  phone: null,
-  email: null,
+  name: '',
+  phone: '',
+  email: '',
   roles: [],
-  role : null,
-  status: null,
-  accessToken: null,
-  refreshToken: null,
+  role: '', // Current selected role
+  status: '',
+  accessToken: '',
+  refreshToken: '',
+  isAuthenticated: false,
 };
+
 const userSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {
     setUser: (state, action) => {
-      state.name = action.payload.name;
-      state.phone = action.payload.phone;
-      state.email = action.payload.email;
-      state.roles = action.payload.roles;
-      state.role = action.payload.role;
-      state.status = action.payload.status;
-      state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
-    },
-    logout: (state) => {
-      state.name = null;
-      state.phone = null;
-      state.email = null;
-      state.roles = [];
-      state.status = null;
-      state.accessToken = null;
-      state.refreshToken = null;
+      const { name, phone, email, roles, role, status, accessToken, refreshToken } = action.payload;
+      state.name = name;
+      state.phone = phone;
+      state.email = email;
+      state.roles = roles;
+      state.role = role;
+      state.status = status;
+      state.accessToken = accessToken;
+      state.refreshToken = refreshToken;
+      state.isAuthenticated = true;
     },
     refreshToken: (state, action) => {
-      state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
+      const { accessToken, refreshToken } = action.payload;
+      state.accessToken = accessToken;
+      state.refreshToken = refreshToken;
+    },
+    logout: (state) => {
+      // Reset to initial state
+      Object.assign(state, initialState);
+    },
+    clearUser: (state) => {
+      // Same as logout for backward compatibility
+      Object.assign(state, initialState);
     },
   },
 });
-export const { setUser, logout, refreshToken } = userSlice.actions;
+
+export const { setUser, refreshToken, logout, clearUser } = userSlice.actions;
 export default userSlice.reducer;

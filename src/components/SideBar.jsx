@@ -77,7 +77,7 @@ export default function Sidebar({
               {name}
             </span>
             <span className="text-xs text-gray-400 dark:text-text-secondaryDark mt-1">
-              {role} – {status}
+              {role} — {status}
             </span>
           </div>
         </div>
@@ -93,7 +93,7 @@ export default function Sidebar({
             <Link
               key={`nav-item-${index}`}
               to={item.path}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+              className={`relative flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
                 location.pathname === item.path
                   ? "bg-primary-light dark:bg-primary-dark text-white dark:text-text-primaryDark"
                   : "text-white dark:text-text-secondaryDark hover:bg-gray-700 dark:hover:bg-neutral-dark hover:text-white dark:hover:text-text-primaryDark"
@@ -101,7 +101,18 @@ export default function Sidebar({
               onClick={onClose}
             >
               {item.icon}
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              
+              {/* Badge for pending users */}
+              {item.hasBadge && item.badgeCount > 0 && (
+                <div className="relative">
+                  <span className="absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full animate-pulse">
+                    {item.badgeCount}
+                  </span>
+                  {/* Small pulsing dot for extra attention */}
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                </div>
+              )}
             </Link>
           ))}
         </nav>
