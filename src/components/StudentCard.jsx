@@ -213,7 +213,7 @@ function StudentCard({
                     aria-label="More options"
                     title="More"
                   >
-                    <svg className="h-5 w-5 text-gray-800 dark:text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="h-5 w-5 text-gray-800 dark:text-white-dark" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                     </svg>
                   </button>
