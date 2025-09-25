@@ -1,3 +1,4 @@
+// Updated src/api/authApi.js with all required functions
 import API from "./Axios.js";
 
 export const registerAdmin = async (formData) => {
@@ -84,7 +85,7 @@ export const updateUser = async (formData) => {
   }
 };
 
-// Fixed: Get pending users with correct API call structure
+// Get pending users with correct API call structure
 export const getPendingUsers = async ({ candiRole }) => {
   try {
     const res = await API.post("/users/pending", { 
@@ -102,7 +103,7 @@ export const getPendingUsers = async ({ candiRole }) => {
   }
 };
 
-// New: Get total pending count (both teachers and parents)
+// Get total pending count (both teachers and parents)
 export const getPendingCount = async () => {
   try {
     // Get both teacher and parent pending counts using POST requests
@@ -141,6 +142,57 @@ export const getPendingCount = async () => {
 export const approveUser = async ({ id, role }) => {
   try {
     const res = await API.patch(`/users/approve/${id}`, { role });
+    return res.data;
+  } catch (error) {
+    const backendMsg =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.response?.statusText ||
+      "Unknown error";
+    throw new Error(`${backendMsg} (status ${error.response?.status || "?"})`);    
+  }
+};
+
+// New functions for bulk operations
+export const approveMultipleUsers = async (userIds) => {
+  try {
+    const res = await API.patch("/users/approve-multiple", { 
+      role: "admin", 
+      userIds 
+    });
+    return res.data;
+  } catch (error) {
+    const backendMsg =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.response?.statusText ||
+      "Unknown error";
+    throw new Error(`${backendMsg} (status ${error.response?.status || "?"})`);    
+  }
+};
+
+export const rejectMultipleUsers = async (userIds) => {
+  try {
+    const res = await API.patch("/users/reject-multiple", { 
+      role: "admin", 
+      userIds 
+    });
+    return res.data;
+  } catch (error) {
+    const backendMsg =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.response?.statusText ||
+      "Unknown error";
+    throw new Error(`${backendMsg} (status ${error.response?.status || "?"})`);    
+  }
+};
+
+export const deleteMultipleUsers = async (userIds) => {
+  try {
+    const res = await API.delete("/users/delete-multiple", { 
+      data: { userIds }
+    });
     return res.data;
   } catch (error) {
     const backendMsg =
