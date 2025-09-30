@@ -1,10 +1,14 @@
-// Fixed ApproveUsers.jsx - Simplified without tabs
-import React, { useState, useEffect, useContext } from 'react';
-import { PendingCountContext } from '../../layouts/adminLayout.jsx';
-import { getPendingUsers, approveUser, approveMultipleUsers, deleteMultipleUsers } from '../../api/authApi.js';
-import UserCard from '../../components/UserCard.jsx';
-import UserDashboard from '../../components/UserDashboard.jsx';
-import NotificationModal from '../../components/NotificationModel.jsx';
+import React, { useState, useEffect, useContext } from "react";
+import { PendingCountContext } from "../../layouts/adminLayout.jsx";
+import {
+  getPendingUsers,
+  approveUser,
+  approveMultipleUsers,
+  deleteMultipleUsers,
+} from "../../api/authApi.js";
+import UserCard from "../../components/UserCard.jsx";
+import NotificationModal from "../../components/NotificationModel.jsx";
+import UserDashboard from "../../components/UserDashboard.jsx";
 
 function ApproveUsers() {
   const { pendingCount, refreshPendingCount } = useContext(PendingCountContext);
@@ -26,7 +30,6 @@ function ApproveUsers() {
     setModalProps((prev) => ({ ...prev, isOpen: false }));
   };
 
-  // Fetch pending users only
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -38,11 +41,13 @@ function ApproveUsers() {
       console.error("Fetch users error:", error);
       setUsers([]);
       setLoading(false);
-      openModal({
-        type: "error",
-        title: "Error",
-        message: error.message || "Failed to fetch pending users",
-      });
+      if (!error.message?.includes("not found")) {
+        openModal({
+          type: "error",
+          title: "Error",
+          message: error.message || "Failed to fetch pending users",
+        });
+      }
     }
   };
 
@@ -70,14 +75,13 @@ function ApproveUsers() {
     setSelectedUsers([]);
   };
 
-  // Individual user actions with multiple choice modal
+  // approve/reject/delete for single user stay the same…
   const handleApprove = (user) => {
     openModal({
       type: "confirm",
       title: "Approve User",
-      message: `Approve ${user.name} only, select multiple, or cancel?`,
-      confirmText: "Approve Only This",
-      cancelText: "Cancel",
+      message: `Are you sure you want to approve ${user.name}?`,
+      confirmText: "Yes, Approve",
       onConfirm: async () => {
         try {
           await approveUser({ id: user._id, role: "admin" });
@@ -95,10 +99,6 @@ function ApproveUsers() {
           });
         }
       },
-      secondaryConfirmText: "Select Multiple",
-      secondaryOnConfirm: () => {
-        toggleSelect(user._id);
-      },
     });
   };
 
@@ -106,9 +106,8 @@ function ApproveUsers() {
     openModal({
       type: "confirm",
       title: "Reject User",
-      message: `Reject ${user.name} only, select multiple, or cancel? Rejection will permanently delete the account.`,
-      confirmText: "Reject Only This",
-      cancelText: "Cancel",
+      message: `Are you sure you want to reject ${user.name}? This will permanently delete the account.`,
+      confirmText: "Yes, Reject",
       onConfirm: async () => {
         try {
           await deleteMultipleUsers([user._id]);
@@ -126,48 +125,12 @@ function ApproveUsers() {
           });
         }
       },
-      secondaryConfirmText: "Select Multiple",
-      secondaryOnConfirm: () => {
-        toggleSelect(user._id);
-      },
     });
   };
 
-  const handleDelete = (user) => {
-    openModal({
-      type: "confirm",
-      title: "Delete User",
-      message: `Delete ${user.name} only, select multiple, or cancel?`,
-      confirmText: "Delete Only This",
-      cancelText: "Cancel",
-      onConfirm: async () => {
-        try {
-          await deleteMultipleUsers([user._id]);
-          openModal({
-            type: "success",
-            title: "Success",
-            message: `${user.name} deleted successfully!`,
-          });
-          await handleUserAction();
-        } catch (error) {
-          openModal({
-            type: "error",
-            title: "Error",
-            message: error.message || "Failed to delete user",
-          });
-        }
-      },
-      secondaryConfirmText: "Select Multiple",
-      secondaryOnConfirm: () => {
-        toggleSelect(user._id);
-      },
-    });
-  };
-
-  // Bulk actions
+  // bulk approve/reject/delete
   const handleApproveSelected = async () => {
     if (selectedUsers.length === 0) return;
-    
     try {
       setLoading(true);
       await approveMultipleUsers(selectedUsers);
@@ -191,11 +154,10 @@ function ApproveUsers() {
 
   const handleRejectSelected = async () => {
     if (selectedUsers.length === 0) return;
-    
     openModal({
       type: "confirm",
       title: "Confirm Rejection",
-      message: `Are you sure you want to reject ${selectedUsers.length} user(s)? This will delete their accounts permanently.`,
+      message: `Are you sure you want to reject ${selectedUsers.length} user(s)?`,
       confirmText: "Yes, Reject All",
       onConfirm: async () => {
         try {
@@ -221,60 +183,26 @@ function ApproveUsers() {
     });
   };
 
-  const handleDeleteSelected = async () => {
-    if (selectedUsers.length === 0) return;
-    
-    openModal({
-      type: "confirm",
-      title: "Confirm Delete",
-      message: `Are you sure you want to delete ${selectedUsers.length} user(s)? This action cannot be undone.`,
-      confirmText: "Yes, Delete All",
-      onConfirm: async () => {
-        try {
-          setLoading(true);
-          await deleteMultipleUsers(selectedUsers);
-          openModal({
-            type: "success",
-            title: "Success",
-            message: `${selectedUsers.length} user(s) deleted successfully!`,
-          });
-          clearSelection();
-          await handleUserAction();
-        } catch (error) {
-          openModal({
-            type: "error",
-            title: "Error",
-            message: error.message || "Failed to delete selected users",
-          });
-        } finally {
-          setLoading(false);
-        }
-      },
-    });
-  };
-
+  // view details/attendance
   const handleViewDetails = (user) => {
     setSelectedUserId(user._id);
     setInitialMode("details");
     clearSelection();
   };
-
   const handleViewAttendance = (user) => {
     setSelectedUserId(user._id);
     setInitialMode("attendance");
     clearSelection();
   };
-
   const handleBackFromDashboard = () => {
     setSelectedUserId(null);
     setInitialMode("details");
   };
 
-  // Show user dashboard if a user is selected
   if (selectedUserId) {
     return (
       <div className="w-full px-4 py-6 flex flex-col flex-1 overflow-hidden">
-        <div className="md:p-4 rounded-xl bg-gray-50 dark:bg-gray-900 shadow flex-1 overflow-y-auto">
+        <div className="md:p-4 rounded-xl bg-surface-light dark:bg-surface-dark shadow flex-1 overflow-y-auto">
           <UserDashboard
             userId={selectedUserId}
             userType={userType}
@@ -290,19 +218,32 @@ function ApproveUsers() {
 
   return (
     <div className="w-full px-4 py-6 flex flex-col flex-1 overflow-hidden">
-      {/* Header */}
+      {/* header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-text-primaryLight dark:text-text-primaryDark">
           Approve Pending Users
         </h1>
-        <div className="bg-yellow-100 dark:bg-yellow-800/30 px-4 py-2 rounded-lg">
-          <span className="text-yellow-700 dark:text-yellow-300 font-medium">
-            {pendingCount} pending approval{pendingCount !== 1 ? 's' : ''}
+        <div className="bg-warning-light/20 dark:bg-warning-dark/20 px-3 py-1 rounded-full flex items-center gap-2 border border-warning-light/30 dark:border-warning-dark/30 shadow-sm">
+          <svg
+            className="w-4 h-4 text-warning-light dark:text-warning-dark"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4m0 4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"
+            />
+          </svg>
+          <span className="text-warning-light dark:text-warning-dark text-sm font-medium">
+            {pendingCount} pending approval{pendingCount !== 1 ? "s" : ""}
           </span>
         </div>
       </div>
 
-      {/* User Type Toggle */}
+      {/* type toggle */}
       <div className="flex gap-2 mb-6">
         {["parent", "teacher"].map((type) => (
           <button
@@ -311,78 +252,48 @@ function ApproveUsers() {
               setUserType(type);
               clearSelection();
             }}
-            className={`
-              px-4 py-2 rounded-lg font-medium transition-colors
-              ${
-                userType === type
-                  ? "bg-purple-500 text-white dark:bg-purple-600"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
-              }
-            `}
+            className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-sm ${
+              userType === type
+                ? "bg-primary-light dark:bg-primary-dark text-white-light dark:text-white-dark shadow-md scale-105"
+                : "bg-surface-light dark:bg-surface-dark text-text-primaryLight dark:text-text-primaryDark hover:bg-surfaceAlt-light dark:hover:bg-surfaceAlt-dark border border-neutral-light/30 dark:border-neutral-dark/30"
+            }`}
           >
             {type === "parent" ? "👨‍👩‍👧‍👦 Parents" : "👨‍🏫 Teachers"}
           </button>
         ))}
       </div>
 
-      {/* Selection Controls */}
-      <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400 mb-4">
-        <p>
-          {users.length} pending {userType}{users.length !== 1 ? 's' : ''} found
-        </p>
-        
-        {isSelectMode && (
-          <div className="flex gap-2">
-            <button
-              onClick={selectAll}
-              className="px-3 py-1 rounded bg-blue-500 text-white-primary hover:bg-blue-600 text-sm font-medium"
-            >
-              Select All
-            </button>
-            <button
-              onClick={clearSelection}
-              className="px-3 py-1 rounded bg-gray-500 text-white-primary hover:bg-gray-600 text-sm font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleApproveSelected}
-              disabled={selectedUsers.length === 0 || loading}
-              className="px-3 py-1 rounded bg-green-500 text-white-primary hover:bg-green-600 disabled:opacity-50 text-sm font-medium"
-            >
-              {loading ? "Processing..." : `Approve (${selectedUsers.length})`}
-            </button>
-            <button
-              onClick={handleRejectSelected}
-              disabled={selectedUsers.length === 0 || loading}
-              className="px-3 py-1 rounded bg-red-500 text-white-primary hover:bg-red-600 disabled:opacity-50 text-sm font-medium"
-            >
-              {loading ? "Processing..." : `Reject (${selectedUsers.length})`}
-            </button>
-            <button
-              onClick={handleDeleteSelected}
-              disabled={selectedUsers.length === 0 || loading}
-              className="px-3 py-1 rounded bg-gray-600 text-white-primary hover:bg-gray-700 disabled:opacity-50 text-sm font-medium"
-            >
-              {loading ? "Processing..." : `Delete (${selectedUsers.length})`}
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Loading State */}
-      {loading && (
-        <div className="flex justify-center items-center py-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-            <p className="text-gray-700 dark:text-gray-300">Loading users...</p>
-          </div>
+      {/* bulk buttons (mobile stacked) */}
+      {isSelectMode && (
+        <div className="flex flex-col gap-3 mb-6">
+          <button
+            onClick={handleApproveSelected}
+            disabled={loading}
+            className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-green-light to-accent-light hover:from-green-light/90 hover:to-accent-light/90 disabled:opacity-50 text-white-light font-semibold shadow-lg transition-all duration-200 transform hover:scale-105 disabled:hover:scale-100"
+          >
+            ✅ Approve ({selectedUsers.length})
+          </button>
+          <button
+            onClick={handleRejectSelected}
+            disabled={loading}
+            className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-red-light to-danger-light hover:from-red-light/90 hover:to-danger-light/90 disabled:opacity-50 text-white-light font-semibold shadow-lg transition-all duration-200 transform hover:scale-105 disabled:hover:scale-100"
+          >
+            ❌ Reject ({selectedUsers.length})
+          </button>
         </div>
       )}
 
-      {/* Users List */}
-      {!loading && (
-        <div className="md:p-4 rounded-xl bg-gray-50 dark:bg-gray-900 shadow flex-1 overflow-y-auto">
+      {loading ? (
+        <div className="flex justify-center items-center py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-light dark:border-primary-dark border-t-transparent mx-auto mb-4"></div>
+            <p className="text-text-secondaryLight dark:text-text-secondaryDark font-medium">
+              Loading users…
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="md:p-4 rounded-xl bg-surface-light dark:bg-surface-dark shadow flex-1 overflow-y-auto border border-neutral-light/20 dark:border-neutral-dark/20">
           <div className="space-y-3 p-4">
             {users.length > 0 ? (
               users.map((user, index) => (
@@ -394,31 +305,40 @@ function ApproveUsers() {
                   onApprove={handleApprove}
                   onReject={handleReject}
                   onViewDetails={handleViewDetails}
-                  onViewAttendance={userType === "teacher" ? handleViewAttendance : undefined}
-                  onDelete={handleDelete}
+                  onViewAttendance={
+                    userType === "teacher" ? handleViewAttendance : undefined
+                  }
+                  onDelete={() => {}}
                   isSelected={selectedUsers.includes(user._id)}
                   onToggleSelect={() => toggleSelect(user._id)}
-                  onStartSelect={() => toggleSelect(user._id)}
                   isSelectMode={isSelectMode}
                 />
               ))
             ) : (
-              <div className="text-center py-8">
-                <div className="text-6xl mb-4">
+              <div className="text-center py-16">
+                <div className="text-8xl mb-6">
                   {userType === "parent" ? "👨‍👩‍👧‍👦" : "👨‍🏫"}
                 </div>
-                <p className="text-gray-700 dark:text-gray-200 text-lg font-medium mb-2">
-                  No Pending {userType}s
-                </p>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">
-                  All {userType}s have been approved. Great job! 🎉
-                </p>
+                <div className="max-w-md mx-auto">
+                  <h3 className="text-2xl font-bold text-text-primaryLight dark:text-text-primaryDark mb-3">
+                    All Caught Up! 🎉
+                  </h3>
+                  <p className="text-lg text-text-secondaryLight dark:text-text-secondaryDark mb-2">
+                    <span className="font-semibold text-accent-light dark:text-accent-dark">
+                      0
+                    </span>{" "}
+                    {userType}s waiting for approval
+                  </p>
+                  <p className="text-text-secondaryLight dark:text-text-secondaryDark">
+                    All {userType}s have been reviewed. Great job managing the
+                    school!
+                  </p>
+                </div>
               </div>
             )}
           </div>
         </div>
       )}
-
       <NotificationModal {...modalProps} />
     </div>
   );

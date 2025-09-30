@@ -1,7 +1,7 @@
 // userApi.js - API functions for user management
 import API from "./Axios.js";
 
-// Get user details by ID
+// Get user details by ID - FIXED: This function was missing
 export const getUserDetails = async (id) => {
   try {
     const res = await API.get(`/users/get-user/${id}`);

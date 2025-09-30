@@ -99,6 +99,16 @@ export const getPendingUsers = async ({ candiRole }) => {
       error.response?.data?.error ||
       error.response?.statusText ||
       "Unknown error";
+    
+    // FIXED: Don't throw error for "not found" cases, return empty array instead
+    if (error.response?.status === 404 || backendMsg.toLowerCase().includes("not found")) {
+      return {
+        data: {
+          pendingUsers: []
+        }
+      };
+    }
+    
     throw new Error(`${backendMsg} (status ${error.response?.status || "?"})`);    
   }
 };
@@ -153,7 +163,7 @@ export const approveUser = async ({ id, role }) => {
   }
 };
 
-// New functions for bulk operations
+// Bulk operations for multiple users
 export const approveMultipleUsers = async (userIds) => {
   try {
     const res = await API.patch("/users/approve-multiple", { 
