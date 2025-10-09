@@ -80,6 +80,20 @@ export const getUsersByRole = async ({
   }
 };
 
+export const getParentWithChildren = async (parentId) => {
+  try {
+    const res = await API.get(`/users/children/${parentId}`);
+    return res.data;
+  } catch (err) {
+    const backendMsg =
+      err.response?.data?.message ||
+      err.response?.data?.error ||
+      err.response?.statusText ||
+      "Unknown error";
+    throw new Error(`${backendMsg} (status ${err.response?.status || "?"})`);
+  }
+};
+
 // Approve multiple users
 export const approveMultipleUsers = async (userIds) => {
   try {
