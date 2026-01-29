@@ -7,6 +7,7 @@ import {
   MdPersonAdd,
   MdPhotoLibrary,
   MdVerifiedUser,
+  MdClass,
 } from "react-icons/md";
 import { Menu } from "lucide-react";
 import Sidebar from "../components/sideBar";
@@ -27,6 +28,11 @@ export default function AdminLayout() {
     { path: "/admin", label: "Dashboard", icon: <MdDashboard size={20} /> },
     { path: "/admin/staff", label: "Manage Staff", icon: <MdPersonAdd size={20} /> },
     { path: "/admin/students", label: "Manage Students", icon: <MdPeople size={20} /> },
+    {
+      path: "/admin/classes",
+      label: "Manage Classes",
+      icon: <MdClass size={20} />,
+    },
     {
       path: "/admin/approve-users",
       label: "Approve pending Users",

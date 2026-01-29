@@ -27,6 +27,7 @@ import AdminDash from "./pages/Admin/AdminDash.jsx";
 import ManageStaff from "./pages/Admin/ManageStaff.jsx";
 import ManageStudents from "./pages/Admin/ManageStudents.jsx";
 import ApproveUsers from "./pages/Admin/ApproveUsers.jsx";
+import ManageClasses from "./pages/Admin/ManageClasses.jsx";
 import PhotoGallery from "./pages/Admin/PhotoGallery.jsx";
 
 // Teacher pages
@@ -66,6 +67,7 @@ const router = createBrowserRouter([
           { path: "students", element: <ManageStudents /> },
           { path: "photo-gallery", element: <PhotoGallery /> },
           { path: "approve-users", element: <ApproveUsers /> },
+          { path: "classes", element: <ManageClasses /> },
         ],
       },
 
