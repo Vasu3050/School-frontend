@@ -27,7 +27,7 @@ export default function TeacherLayout() {
     },
     {
       path: "/teacher/photo-gallery",
-      label: "Manage Photo Gallery",
+      label: "Photo Gallery",
       icon: <MdPhotoLibrary size={20} />,
     },
     {

@@ -27,6 +27,7 @@ import AdminDash from "./pages/Admin/AdminDash.jsx";
 import ManageStaff from "./pages/Admin/ManageStaff.jsx";
 import ManageStudents from "./pages/Admin/ManageStudents.jsx";
 import ApproveUsers from "./pages/Admin/ApproveUsers.jsx";
+import PhotoGallery from "./pages/Admin/PhotoGallery.jsx";
 
 // Teacher pages
 import TeacherDash from "./pages/Teacher/TeacherDash.jsx";
@@ -34,6 +35,7 @@ import MyAttendance from "./pages/Teacher/MyAttendance.jsx";
 import ManageTeacherStudents from "./pages/Teacher/ManageTeacherStudents.jsx";
 import StudentAttendance from "./pages/Teacher/StudentAttendance.jsx";
 import TeacherDiary from "./pages/Teacher/TeacherDiary.jsx";
+import TeacherPhotoGallery from "./pages/Teacher/TeacherPhotoGallery.jsx";
 
 // Parent pages
 import ParentDash from "./pages/Parent/ParentDash.jsx";
@@ -62,7 +64,7 @@ const router = createBrowserRouter([
           { index: true, element: <AdminDash /> },
           { path: "staff", element: <ManageStaff /> },
           { path: "students", element: <ManageStudents /> },
-          { path: "photo-gallery", element: <GalleryPage /> },
+          { path: "photo-gallery", element: <PhotoGallery /> },
           { path: "approve-users", element: <ApproveUsers /> },
         ],
       },
@@ -74,7 +76,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <TeacherDash /> },
           { path: "students", element: <ManageTeacherStudents /> },
-          { path: "photo-gallery", element: <GalleryPage /> },
+          { path: "photo-gallery", element: <TeacherPhotoGallery /> },
           { path: "student-attendance", element: <StudentAttendance /> },
           { path: "my-attendance", element: <MyAttendance /> },
           { path: "daily-diary", element: <TeacherDiary /> },

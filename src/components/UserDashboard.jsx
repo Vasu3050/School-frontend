@@ -1,8 +1,7 @@
 // UserDashboard.jsx - View user details component
 import React, { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { getUserDetails, updateUserDetails, deleteUser } from "../api/userApi.js";
-import { getChildren } from "../api/parentApi.js";
+import { getUserDetails, updateUserDetails, deleteUser, getParentWithChildren } from "../api/userApi.js";
 
 const UserDashboard = ({ userId, userType, initialMode, onBack, openModal }) => {
   const [user, setUser] = useState(null);
@@ -27,32 +26,42 @@ const UserDashboard = ({ userId, userType, initialMode, onBack, openModal }) => 
       try {
         setLoading(true);
         
-        // Fetch user details
-        const userResponse = await getUserDetails(userId);
-        console.log("User fetch response:", userResponse);
-        
-        const userData = userResponse?.data?.user || userResponse?.user || userResponse;
-        
-        if (!userData || !userData._id) {
-          throw new Error("Invalid user data received.");
-        }
-        
-        setUser(userData);
-        reset({
-          name: userData.name || "",
-          email: userData.email || "",
-          phone: userData.phone || "",
-        });
-
-        // If parent, fetch children
+        // If parent, use the new getParentWithChildren API
         if (userType === "parent") {
-          try {
-            const childrenResponse = await getChildren({ page: 1, limit: 10 });
-            setChildren(childrenResponse?.data?.docs || []);
-          } catch (childError) {
-            console.log("No children found for parent:", childError);
-            setChildren([]);
+          const parentResponse = await getParentWithChildren(userId);
+          console.log("Parent with children response:", parentResponse);
+          
+          const parentData = parentResponse?.data?.parent || parentResponse?.parent;
+          const childrenData = parentResponse?.data?.children || parentResponse?.children || [];
+          
+          if (!parentData || !parentData._id) {
+            throw new Error("Invalid parent data received.");
           }
+          
+          setUser(parentData);
+          setChildren(childrenData);
+          reset({
+            name: parentData.name || "",
+            email: parentData.email || "",
+            phone: parentData.phone || "",
+          });
+        } else {
+          // For non-parent users, use getUserDetails
+          const userResponse = await getUserDetails(userId);
+          console.log("User fetch response:", userResponse);
+          
+          const userData = userResponse?.data?.user || userResponse?.user || userResponse;
+          
+          if (!userData || !userData._id) {
+            throw new Error("Invalid user data received.");
+          }
+          
+          setUser(userData);
+          reset({
+            name: userData.name || "",
+            email: userData.email || "",
+            phone: userData.phone || "",
+          });
         }
         
         setLoading(false);
@@ -88,15 +97,29 @@ const UserDashboard = ({ userId, userType, initialMode, onBack, openModal }) => 
       await updateUserDetails({ id: userId, formData: data });
       setIsEditing(false);
       
-      // Refresh user data
-      const response = await getUserDetails(userId);
-      const userData = response?.data?.user || response?.user || response;
-      setUser(userData);
-      reset({
-        name: userData.name || "",
-        email: userData.email || "",
-        phone: userData.phone || "",
-      });
+      // Refresh user data based on userType
+      if (userType === "parent") {
+        const parentResponse = await getParentWithChildren(userId);
+        const parentData = parentResponse?.data?.parent || parentResponse?.parent;
+        const childrenData = parentResponse?.data?.children || parentResponse?.children || [];
+        
+        setUser(parentData);
+        setChildren(childrenData);
+        reset({
+          name: parentData.name || "",
+          email: parentData.email || "",
+          phone: parentData.phone || "",
+        });
+      } else {
+        const response = await getUserDetails(userId);
+        const userData = response?.data?.user || response?.user || response;
+        setUser(userData);
+        reset({
+          name: userData.name || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+        });
+      }
       
       openModal({
         type: "success",
@@ -245,7 +268,7 @@ const UserDashboard = ({ userId, userType, initialMode, onBack, openModal }) => 
           <button
             onClick={() => setIsEditing(!isEditing)}
             title="Edit"
-            className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white-primary shadow-sm"
+            className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white-light shadow-sm"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

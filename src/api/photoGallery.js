@@ -101,3 +101,33 @@ export const editPhotoById = async ({ id, formData }) => {
     throw new Error(`${backendMsg} (status ${err.response?.status || "?"})`);
   }
 };
+
+// Get gallery for management (with pagination and filtering)
+export const getGalleryForManagement = async ({ page = 1, limit = 12, type = 'all' } = {}) => {
+  try {
+    const res = await API.get(`/gallery/manage?page=${page}&limit=${limit}&type=${type}`);
+    return res.data;
+  } catch (err) {
+    const backendMsg =
+      err.response?.data?.message ||
+      err.response?.data?.error ||
+      err.response?.statusText ||
+      "Unknown error";
+    throw new Error(`${backendMsg} (status ${err.response?.status || "?"})`);
+  }
+};
+
+// Get single photo details
+export const getPhotoById = async (id) => {
+  try {
+    const res = await API.get(`/gallery/${id}`);
+    return res.data;
+  } catch (err) {
+    const backendMsg =
+      err.response?.data?.message ||
+      err.response?.data?.error ||
+      err.response?.statusText ||
+      "Unknown error";
+    throw new Error(`${backendMsg} (status ${err.response?.status || "?"})`);
+  }
+};
