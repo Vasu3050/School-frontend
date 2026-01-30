@@ -2,6 +2,8 @@
 import API from "./Axios.js";
 
 export const getAllClasses = () => API.get("/class/all");
+export const getMyClasses = () => API.get("/class/my");
+
 export const createClass = (payload) => API.post("/class/create", payload);
 export const updateClass = (classId, payload) =>
   API.patch(`/class/${classId}`, payload);

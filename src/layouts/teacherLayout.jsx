@@ -7,6 +7,7 @@ import {
   MdPhotoLibrary,
   MdChecklist,
   MdAssignment,
+  MdClass,
 } from "react-icons/md";
 import { Menu } from "lucide-react";
 import Sidebar from "../components/sideBar";
@@ -22,8 +23,8 @@ export default function TeacherLayout() {
     { path: "/teacher", label: "Dashboard", icon: <MdDashboard size={20} /> },
     {
       path: "/teacher/students",
-      label: "Manage Students",
-      icon: <MdPeople size={20} />,
+      label: "Manage Class",
+      icon: <MdClass size={20} />,
     },
     {
       path: "/teacher/photo-gallery",
