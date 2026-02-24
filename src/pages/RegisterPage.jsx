@@ -9,6 +9,9 @@ import SubmitButton from "../components/SubmitButton";
 //tester
 
 
+//new change
+
+
 export default function RegisterPage() {
   const navigate = useNavigate();
 
