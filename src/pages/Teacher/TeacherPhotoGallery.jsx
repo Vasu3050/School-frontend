@@ -45,6 +45,10 @@ import NotificationModel from "../../components/NotificationModel.jsx";
  * - WhatsApp share fallback
  * - NotificationModel used for confirmations & success/error messages
  * - Search icon kept at w-5 h-5 per backend requirement
+ * 
+ * FIXES:
+ * - Dark mode card text (date/user) now clearly visible
+ * - Action icon buttons have border + shadow so they're visible on any image colour
  */
 const TeacherPhotoGallery = () => {
   // data + pagination
@@ -345,19 +349,19 @@ const TeacherPhotoGallery = () => {
               <p className="text-sm text-text-secondaryLight dark:text-text-secondaryDark mt-1">Share classroom moments and special events with parents</p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-2 w-full sm:w-auto">
               <button
                 onClick={() => fetchGallery(1, filterType)}
-                className="flex items-center gap-2 px-3 py-2 h-10 rounded-lg border border-neutral-light dark:border-neutral-dark bg-white-light dark:bg-black-light text-text-primaryLight dark:text-text-primaryDark"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2 h-10 rounded-lg border-2 border-neutral-light dark:border-neutral-dark bg-white-light dark:bg-black-light text-text-primaryLight dark:text-text-primaryDark hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 font-medium"
               >
-                <RefreshCw size={18} /> Refresh
+                <RefreshCw size={16} /> Refresh
               </button>
 
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="flex items-center gap-2 px-3 py-2 h-10 rounded-lg bg-primary-light dark:bg-primary-dark text-white"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2 h-10 rounded-lg bg-blue-500 hover:bg-blue-700 text-white-light transition-all duration-200 font-medium"
               >
-                <Plus size={18} /> Upload Media
+                <Plus size={16} /> Upload
               </button>
             </div>
           </div>
@@ -425,15 +429,15 @@ const TeacherPhotoGallery = () => {
 
             {/* Bulk actions */}
             {selectedPhotos.length > 0 && (
-              <div className="flex gap-2 items-center mt-3 lg:mt-0">
-                <span className="text-sm text-text-secondaryLight dark:text-secondaryDark">{selectedPhotos.length} selected</span>
-                <button onClick={handleBulkDownload} className="flex items-center gap-2 px-3 py-2 h-10 bg-accent-light dark:bg-accent-dark text-white rounded-lg">
+              <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center mt-3 lg:mt-0 w-full sm:w-auto">
+                <span className="text-sm font-medium text-text-secondaryLight dark:text-text-secondaryDark px-2 py-1">{selectedPhotos.length} selected</span>
+                <button onClick={handleBulkDownload} className="w-full sm:w-auto flex items-center justify-center gap-2 px-3 py-2 h-10 bg-green-500 hover:bg-green-700 text-white-light rounded-lg transition-all duration-200 font-medium">
                   <Download size={16} /> Download
                 </button>
-                <button onClick={confirmBulkDelete} className="flex items-center gap-2 px-3 py-2 h-10 bg-danger-light dark:bg-danger-dark text-white rounded-lg">
+                <button onClick={confirmBulkDelete} className="w-full sm:w-auto flex items-center justify-center gap-2 px-3 py-2 h-10 bg-red-500 hover:bg-red-700 text-white-light rounded-lg transition-all duration-200 font-medium">
                   <Trash2 size={16} /> Delete
                 </button>
-                <button onClick={() => setSelectedPhotos([])} className="px-3 py-2 h-10 border border-neutral-light dark:border-neutral-dark rounded-lg bg-white-light dark:bg-black-light">
+                <button onClick={() => setSelectedPhotos([])} className="w-full sm:w-auto px-3 py-2 h-10 border-2 border-neutral-light dark:border-neutral-dark rounded-lg bg-white-light dark:bg-black-light text-text-primaryLight dark:text-text-primaryDark hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 font-medium">
                   Clear
                 </button>
               </div>
@@ -443,7 +447,7 @@ const TeacherPhotoGallery = () => {
           {/* select all */}
           <div className="mt-4 flex items-center gap-2">
             <input type="checkbox" checked={selectedPhotos.length === gallery.length && gallery.length > 0} onChange={handleSelectAll} className="rounded border-neutral-light dark:border-neutral-dark" />
-            <span className="text-sm text-text-secondaryLight dark:text-secondaryDark">Select All ({gallery.length} items)</span>
+            <span className="text-sm text-text-secondaryLight dark:text-text-secondaryDark">Select All ({gallery.length} items)</span>
           </div>
         </motion.div>
 
@@ -462,7 +466,7 @@ const TeacherPhotoGallery = () => {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
             <BookOpen size={48} className="mx-auto text-neutral-light dark:text-neutral-dark mb-4" />
             <h3 className="text-xl font-semibold text-text-primaryLight dark:text-text-primaryDark mb-2">No photos found</h3>
-            <p className="text-text-secondaryLight dark:text-secondaryDark mb-4">{searchTerm ? "Try different keywords" : "Start sharing classroom moments with parents"}</p>
+            <p className="text-text-secondaryLight dark:text-text-secondaryDark mb-4">{searchTerm ? "Try different keywords" : "Start sharing classroom moments with parents"}</p>
             {!searchTerm && <button onClick={() => setShowUploadModal(true)} className="px-6 py-3 bg-primary-light dark:bg-primary-dark text-white rounded-lg">Upload Photo</button>}
           </motion.div>
         ) : (
@@ -479,14 +483,117 @@ const TeacherPhotoGallery = () => {
                       <img src={photo.Url} alt={photo.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer" onClick={() => openPreview(photo)} />
                     )}
 
-                    {/* Overlay with actions (icons on hover) */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all">
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                        <button onClick={() => openPreview(photo)} className="p-2 bg-white bg-opacity-90 rounded-full"><Eye size={16} /></button>
-                        <button onClick={() => openEdit(photo)} className="p-2 bg-white bg-opacity-90 rounded-full"><Edit3 size={16} /></button>
-                        <button onClick={() => handleDownloadPhoto(photo)} className="p-2 bg-white bg-opacity-90 rounded-full"><Download size={16} /></button>
-                        <button onClick={() => sharePhoto(photo)} className="p-2 bg-white bg-opacity-90 rounded-full"><Share2 size={16} /></button>
-                        <button onClick={() => confirmDelete(photo._id)} className="p-2 bg-white bg-opacity-90 rounded-full"><Trash2 size={16} /></button>
+                    {/* ── FIX: Action buttons — Desktop hover reveal + Mobile 3-dot menu ── */}
+                    {/* Desktop: Hover to reveal buttons */}
+                    <div className="hidden sm:block absolute inset-0">
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition-all duration-200">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1.5 flex-wrap justify-center px-3">
+                          <button
+                            onClick={() => openPreview(photo)}
+                            title="Preview"
+                            className="p-2.5 rounded-full
+                              bg-blue-500/90 hover:bg-blue-700
+                              text-white-light
+                              border-2 border-white-light/50
+                              shadow-[0_2px_8px_rgba(0,0,0,0.45)]
+                              transition-all duration-150"
+                          >
+                            <Eye size={15} />
+                          </button>
+                          <button
+                            onClick={() => openEdit(photo)}
+                            title="Edit"
+                            className="p-2.5 rounded-full
+                              bg-amber-500/90 hover:bg-amber-700
+                              text-white-light
+                              border-2 border-white-light/50
+                              shadow-[0_2px_8px_rgba(0,0,0,0.45)]
+                              transition-all duration-150"
+                          >
+                            <Edit3 size={15} />
+                          </button>
+                          <button
+                            onClick={() => handleDownloadPhoto(photo)}
+                            title="Download"
+                            className="p-2.5 rounded-full
+                              bg-green-500/90 hover:bg-green-700
+                              dark:text-white-light
+                              border-2 border-white-light/50
+                              shadow-[0_2px_8px_rgba(0,0,0,0.45)]
+                              transition-all duration-150"
+                          >
+                            <Download size={15} />
+                          </button>
+                          <button
+                            onClick={() => sharePhoto(photo)}
+                            title="Share"
+                            className="p-2.5 rounded-full
+                              bg-purple-500/90 hover:bg-purple-700
+                              text-white-light
+                              border-2 border-white-light/50
+                              shadow-[0_2px_8px_rgba(0,0,0,0.45)]
+                              transition-all duration-150"
+                          >
+                            <Share2 size={15} />
+                          </button>
+                          <button
+                            onClick={() => confirmDelete(photo._id)}
+                            title="Delete"
+                            className="p-2.5 rounded-full
+                              bg-red-500/90 hover:bg-red-700
+                              text-white-light
+                              border-2 border-white-light/50
+                              shadow-[0_2px_8px_rgba(0,0,0,0.45)]
+                              transition-all duration-150"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mobile: 3-dot menu button (fixed position, stays in bounds) */}
+                    <div className="sm:hidden absolute top-3 right-3 z-20">
+                      <div className="relative group">
+                        <button 
+                          className="p-2 rounded-full bg-gray-700/80 hover:bg-gray-900 text-white-light border-2 border-white-light/40 shadow-md transition-all duration-150"
+                          title="Menu"
+                        >
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5"/><circle cx="12" cy="12" r="2.5"/><circle cx="12" cy="19" r="2.5"/></svg>
+                        </button>
+                        {/* Dropdown menu */}
+                        <div className="absolute right-0 mt-1 w-44 bg-surface-light dark:bg-surface-dark rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 border border-neutral-light dark:border-neutral-dark py-1">
+                          <button
+                            onClick={() => openPreview(photo)}
+                            className="w-full px-4 py-2.5 text-left text-sm text-text-primaryLight dark:text-text-primaryDark hover:bg-blue-500/30 dark:hover:bg-blue-500/30 flex items-center gap-3 transition-colors duration-150 font-medium"
+                          >
+                            <Eye size={16} /> View
+                          </button>
+                          <button
+                            onClick={() => openEdit(photo)}
+                            className="w-full px-4 py-2.5 text-left text-sm text-text-primaryLight dark:text-text-primaryDark hover:bg-amber-500/30 dark:hover:bg-amber-500/30 flex items-center gap-3 transition-colors duration-150 font-medium"
+                          >
+                            <Edit3 size={16} /> Edit
+                          </button>
+                          <button
+                            onClick={() => handleDownloadPhoto(photo)}
+                            className="w-full px-4 py-2.5 text-left text-sm text-text-primaryLight dark:text-text-primaryDark hover:bg-green-500/30 dark:hover:bg-green-500/30 flex items-center gap-3 transition-colors duration-150 font-medium"
+                          >
+                            <Download size={16} /> Download
+                          </button>
+                          <button
+                            onClick={() => sharePhoto(photo)}
+                            className="w-full px-4 py-2.5 text-left text-sm text-text-primaryLight dark:text-text-primaryDark hover:bg-purple-500/30 dark:hover:bg-purple-500/30 flex items-center gap-3 transition-colors duration-150 font-medium"
+                          >
+                            <Share2 size={16} /> Share
+                          </button>
+                          <button
+                            onClick={() => confirmDelete(photo._id)}
+                            className="w-full px-4 py-2.5 text-left text-sm text-text-primaryLight dark:text-text-primaryDark hover:bg-red-500/30 dark:hover:bg-red-500/30 flex items-center gap-3 transition-colors duration-150 font-medium"
+                          >
+                            <Trash2 size={16} /> Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
 
@@ -497,14 +604,21 @@ const TeacherPhotoGallery = () => {
                     </div>
                   </div>
 
+                  {/* ── FIX: Card footer — explicit strong colours in both modes ── */}
                   <div className="p-4">
-                    <h3 className="font-semibold text-text-primaryLight dark:text-text-primaryDark truncate">{photo.title}</h3>
-                    <div className="flex items-center gap-2 mt-2 text-sm text-text-secondaryLight dark:text-secondaryDark">
-                      <User size={14} />
-                      <span>{photo.postedBy?.name || "Unknown"}</span>
+                    <h3 className="font-semibold text-text-primaryLight dark:text-text-primaryDark truncate">
+                      {photo.title}
+                    </h3>
+                    {/* User row */}
+                    <div className="flex items-center gap-2 mt-2 text-sm
+                      text-gray-600 dark:text-gray-300">
+                      <User size={14} className="flex-shrink-0 text-gray-500 dark:text-gray-400" />
+                      <span className="truncate">{photo.postedBy?.name || "Unknown"}</span>
                     </div>
-                    <div className="flex items-center gap-2 mt-1 text-sm text-text-secondaryLight dark:text-secondaryDark">
-                      <Calendar size={14} />
+                    {/* Date row */}
+                    <div className="flex items-center gap-2 mt-1 text-sm
+                      text-gray-500 dark:text-gray-400">
+                      <Calendar size={14} className="flex-shrink-0 text-gray-400 dark:text-gray-500" />
                       <span>{new Date(photo.createdAt).toLocaleDateString()}</span>
                     </div>
                   </div>
@@ -557,15 +671,15 @@ const TeacherPhotoGallery = () => {
                     {uploadFiles.map((f, idx) => (
                       <div key={idx} className="flex items-center gap-3">
                         <input type="text" value={uploadTitles[`title${idx + 1}`] || ""} onChange={(e) => handleTitleChange(idx, e.target.value)} className="flex-1 p-2 rounded border border-neutral-light dark:border-neutral-dark bg-white-light dark:bg-black-light" />
-                        <div className="text-xs text-text-secondaryLight dark:text-secondaryDark">{f.name}</div>
+                        <div className="text-xs text-text-secondaryLight dark:text-text-secondaryDark">{f.name}</div>
                       </div>
                     ))}
                   </div>
                 )}
 
                 <div className="flex justify-end gap-2">
-                  <button onClick={() => setShowUploadModal(false)} className="px-3 py-2 border rounded bg-white-light dark:bg-black-light">Cancel</button>
-                  <button onClick={handleUpload} disabled={uploading || uploadFiles.length === 0} className="px-4 py-2 bg-primary-light dark:bg-primary-dark text-white rounded">
+                  <button onClick={() => setShowUploadModal(false)} className="px-4 py-2 h-10 border-2 border-neutral-light dark:border-neutral-dark rounded-lg bg-white-light dark:bg-black-light text-text-primaryLight dark:text-text-primaryDark hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 font-medium">Cancel</button>
+                  <button onClick={handleUpload} disabled={uploading || uploadFiles.length === 0} className="px-4 py-2 h-10 bg-blue-500 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white-light rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2">
                     {uploading ? "Uploading..." : <><Upload size={14} /> Upload</>}
                   </button>
                 </div>
@@ -596,8 +710,8 @@ const TeacherPhotoGallery = () => {
                 </div>
 
                 <div className="flex justify-end gap-2">
-                  <button onClick={() => setShowEditModal(false)} className="px-3 py-2 border rounded">Cancel</button>
-                  <button onClick={saveEdit} className="px-4 py-2 bg-primary-light dark:bg-primary-dark text-white rounded">Save</button>
+                  <button onClick={() => setShowEditModal(false)} className="px-4 py-2 h-10 border-2 border-neutral-light dark:border-neutral-dark rounded-lg bg-white-light dark:bg-black-light text-text-primaryLight dark:text-text-primaryDark hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 font-medium">Cancel</button>
+                  <button onClick={saveEdit} className="px-4 py-2 h-10 bg-blue-500 hover:bg-blue-700 text-white-light rounded-lg transition-all duration-200 font-medium">Save</button>
                 </div>
               </div>
             </motion.div>
@@ -624,19 +738,19 @@ const TeacherPhotoGallery = () => {
                   <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                       <div className="text-lg font-semibold text-text-primaryLight dark:text-text-primaryDark">{previewPhoto.title}</div>
-                      <div className="text-xs text-text-secondaryLight dark:text-secondaryDark mt-1 flex items-center gap-2">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
                         <User size={12} /> {previewPhoto.postedBy?.name || "Unknown"} • <Calendar size={12} /> {new Date(previewPhoto.createdAt).toLocaleDateString()}
                       </div>
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                      <button onClick={() => handleDownloadPhoto(previewPhoto)} className="w-full sm:w-auto px-4 py-2 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2">
+                      <button onClick={() => handleDownloadPhoto(previewPhoto)} className="w-full sm:w-auto px-4 py-2 h-10 bg-blue-500 hover:bg-blue-700 text-white-light rounded-lg flex items-center justify-center gap-2 transition-all duration-200 font-medium">
                         <Download size={16} /> Download
                       </button>
-                      <button onClick={() => sharePhoto(previewPhoto)} className="w-full sm:w-auto px-4 py-2 h-10 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center gap-2">
+                      <button onClick={() => sharePhoto(previewPhoto)} className="w-full sm:w-auto px-4 py-2 h-10 bg-purple-500 hover:bg-purple-700 text-white-light rounded-lg flex items-center justify-center gap-2 transition-all duration-200 font-medium">
                         <Share2 size={16} /> Share
                       </button>
-                      <button onClick={() => { const wa = `https://api.whatsapp.com/send?text=${encodeURIComponent(`${previewPhoto.title}\n\n${previewPhoto.Url}`)}`; window.open(wa, "_blank"); }} className="w-full sm:w-auto px-4 py-2 h-10 bg-[#25D366] hover:opacity-95 text-white rounded-lg flex items-center justify-center gap-2">
+                      <button onClick={() => { const wa = `https://api.whatsapp.com/send?text=${encodeURIComponent(`${previewPhoto.title}\n\n${previewPhoto.Url}`)}`; window.open(wa, "_blank"); }} className="w-full sm:w-auto px-4 py-2 h-10 bg-[#25D366] hover:bg-[#1aad56] text-white-light rounded-lg flex items-center justify-center gap-2 transition-all duration-200 font-medium">
                         <Share2 size={16} /> WhatsApp
                       </button>
                     </div>
