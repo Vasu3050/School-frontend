@@ -29,6 +29,7 @@ import ManageStudents from "./pages/Admin/ManageStudents.jsx";
 import ApproveUsers from "./pages/Admin/ApproveUsers.jsx";
 import ManageClasses from "./pages/Admin/ManageClasses.jsx";
 import PhotoGallery from "./pages/Admin/PhotoGallery.jsx";
+import CalendarManagement from "./pages/Admin/CalendarManagement.jsx";
 
 // Teacher pages
 import TeacherDash from "./pages/Teacher/TeacherDash.jsx";
@@ -68,6 +69,7 @@ const router = createBrowserRouter([
           { path: "photo-gallery", element: <PhotoGallery /> },
           { path: "approve-users", element: <ApproveUsers /> },
           { path: "classes", element: <ManageClasses /> },
+          { path: "calendar", element: <CalendarManagement /> },
         ],
       },
 

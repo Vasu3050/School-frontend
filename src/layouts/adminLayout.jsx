@@ -8,6 +8,10 @@ import {
   MdPhotoLibrary,
   MdVerifiedUser,
   MdClass,
+  Md20Mp,
+  MdCarRental,
+  MdCalendarViewMonth,
+  MdCalendarMonth,
 } from "react-icons/md";
 import { Menu } from "lucide-react";
 import Sidebar from "../components/sideBar";
@@ -39,6 +43,11 @@ export default function AdminLayout() {
       icon: <MdVerifiedUser size={20} />,
       hasBadge: true, // Flag to show badge
       badgeCount: pendingCount
+    },
+    {
+      path: "/admin/calendar",
+      label: "Manage Calendar",
+      icon: <MdCalendarMonth size={20} />,
     },
     {
       path: "/admin/photo-gallery",
