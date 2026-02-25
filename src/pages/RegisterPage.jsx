@@ -5,6 +5,13 @@ import { useNavigate } from "react-router-dom";
 import InputField from "../components/InputField";
 import SubmitButton from "../components/SubmitButton";
 
+
+//tester
+
+
+//new change
+
+
 export default function RegisterPage() {
   const navigate = useNavigate();
 
