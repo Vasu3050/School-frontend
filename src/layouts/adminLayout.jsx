@@ -8,10 +8,8 @@ import {
   MdPhotoLibrary,
   MdVerifiedUser,
   MdClass,
-  Md20Mp,
-  MdCarRental,
-  MdCalendarViewMonth,
   MdCalendarMonth,
+  MdCalendarViewWeek
 } from "react-icons/md";
 import { Menu } from "lucide-react";
 import Sidebar from "../components/sideBar";
@@ -53,6 +51,11 @@ export default function AdminLayout() {
       path: "/admin/photo-gallery",
       label: "Manage Photo Gallery",
       icon: <MdPhotoLibrary size={20} />,
+    },
+    {
+      path: "/admin/year",
+      label: "Manage Academic Years",
+      icon: <MdCalendarViewWeek size={20} />,
     },
   ];
 
